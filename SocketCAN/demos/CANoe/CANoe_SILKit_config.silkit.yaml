@@ -1,0 +1,9 @@
+Description: Configuration for CANoe participant for SIL Kit Adapter SocketCAN Demo
+Logging:
+  Sinks:
+    - Level: Info
+      Type: Stdout
+CanControllers:
+ - Name: "CAN"
+   Network: "CAN1"
+	 
