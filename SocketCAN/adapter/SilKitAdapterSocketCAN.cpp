@@ -112,20 +112,6 @@ private:
     std::function<void(can_frame)> _onNewFrameHandler;
 };
 
-void CanAckCallback(ICanController* /*controller*/, const CanFrameTransmitEvent& ack)
-{
-    if (ack.status == CanTransmitStatus::Transmitted)
-    {
-        std::cout << "SIL Kit >> CAN : ACK for CAN Message with transmitId="
-                  << reinterpret_cast<intptr_t>(ack.userContext) << std::endl;
-    }
-    else
-    {
-        std::cout << "SIL Kit >> CAN : NACK for CAN Message with transmitId="
-                  << reinterpret_cast<intptr_t>(ack.userContext) << ": " << ack.status << std::endl;
-    }
-}
-
 inline can_frame SILKitToSocketCAN(const CanFrame& silkit_can_frame)
 {
     struct can_frame socketcan_frame;
@@ -173,6 +159,8 @@ int main(int argc, char** argv)
     const std::string participantName = getArgDefault("--participant-name", "SocketCAN_silkit")();
     const std::string canNetworkName = getArgDefault("--network-name", "CAN1")();
     const std::string canControllerName = participantName + "_CAN_CTRL";
+    const std::string logLvl = getArgDefault("--log", "Info")();
+
     const std::string participantConfigurationString = R"({ "Logging": { "Sinks": [ { "Type": "Stdout", "Level": "Info" } ] } })";
 
     asio::io_context io_context;
@@ -186,24 +174,48 @@ int main(int argc, char** argv)
         std::cout << "Creating CAN controller '" << canControllerName << "'" << std::endl;
         auto* canController = participant->CreateCanController(canControllerName, canNetworkName);
 
-        const auto onReceiveCanFrameFromCanDevice = [canController](can_frame data) 
+        const auto onReceiveCanFrameFromCanDevice = [logLvl, canController](can_frame data) 
         {
             static intptr_t transmitId = 0;
             canController->SendFrame(SocketCANToSILKit(data), reinterpret_cast<void*>(++transmitId));
-            std::cout << "CAN device >> SIL Kit: CAN frame (dlc=" << (int)data.len << " bytes, txId=" << transmitId << ")" << std::endl;
+
+            if (logLvl.compare("Debug") == 0 || logLvl.compare("Trace") == 0)
+            {
+                std::cout << "CAN device >> SIL Kit: CAN frame (dlc=" << (int)data.len << " bytes, txId=" << transmitId << ")" << std::endl;
+            }
         };
 
         std::cout << "Creating CAN device connector for '" << canDevName << "'" << std::endl;
         CanConnection canConnection{io_context, canDevName, onReceiveCanFrameFromCanDevice};
 
-        const auto onReceiveCanMessageFromSilKit = [&canConnection](ICanController* /*controller*/, const CanFrameEvent& msg) {
+        const auto onReceiveCanMessageFromSilKit = [logLvl, &canConnection](ICanController* /*controller*/, const CanFrameEvent& msg) {
             CanFrame recievedFrame = msg.frame;
             canConnection.SendCanFrameToCanDevice(SILKitToSocketCAN(recievedFrame));
-            std::cout << "SIL Kit >> CAN device: CAN frame (" << recievedFrame.dlc << " bytes)" << std::endl;
+
+            if (logLvl.compare("Debug") == 0 || logLvl.compare("Trace") == 0)
+            {
+                std::cout << "SIL Kit >> CAN device: CAN frame (" << recievedFrame.dlc << " bytes)" << std::endl;
+            }
+        };
+
+        const auto onCanAckCallback = [logLvl](ICanController* /*controller*/, const CanFrameTransmitEvent& ack) {
+                if (logLvl.compare("Debug") == 0 || logLvl.compare("Trace") == 0)
+                {
+                    if (ack.status == CanTransmitStatus::Transmitted)
+                    {
+                        std::cout << "SIL Kit >> CAN : ACK for CAN Message with transmitId="
+                            << reinterpret_cast<intptr_t>(ack.userContext) << std::endl;
+                    }
+                    else
+                    {
+                        std::cout << "SIL Kit >> CAN : NACK for CAN Message with transmitId="
+                            << reinterpret_cast<intptr_t>(ack.userContext) << ": " << ack.status << std::endl;
+                    }
+                }
         };
 
         canController->AddFrameHandler(onReceiveCanMessageFromSilKit);
-        canController->AddFrameTransmitHandler(&CanAckCallback);
+        canController->AddFrameTransmitHandler(onCanAckCallback);
         canController->Start();
 
         io_context.run();

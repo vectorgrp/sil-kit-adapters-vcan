@@ -1,4 +1,4 @@
-# Vector SIL Kit Adapter for SocketCAN 
+# Vector SIL Kit Adapter for SocketCAN (Linux only)
 This collection of software is provided to illustrate how the [Vector SIL Kit](https://github.com/vectorgrp/sil-kit/)
 can be attached to a virtual CAN (Controller Area Network) interface [[SocketCAN]](https://docs.kernel.org/networking/can.html) running in Linux kernel.
 
@@ -9,7 +9,9 @@ as well as complimentary demo applications for some communication to happen.
 
 ## Getting Started
 Those instructions assume you use a Linux OS (or a virtual machine running a Linux image) for building and running the adapter and use ``bash`` as your interactive
-shell.
+shell. 
+
+**Note:** WSL/WSL2 are excluded from this context as their standard kernels don't support SocketCAN.   
 
 This section specifies steps you should do if you have just cloned the repository.
 
@@ -45,7 +47,7 @@ SIL Kit.
 
 Before you start the adapter there always needs to be a sil-kit-registry running already. Start it e.g. like this:
 
-    ./path/to/SilKit-x.y.z-$ubuntu/SilKit/bin/sil-kit-registry --listen-uri 'silkit://127.0.0.1:8501'
+    ./path/to/SilKit-x.y.z-$ubuntu/SilKit/bin/sil-kit-registry --listen-uri 'silkit://0.0.0.0:8501'
 
 It is also necessary that a virtual CAN interface is already opened and running in Linux kernel before you run the adapter. This can be done using the following terminal commands: 
 
@@ -55,26 +57,13 @@ It is also necessary that a virtual CAN interface is already opened and running 
 
 **Note:** These commands will open a virtual CAN interface with the name ``can0``.
 
-Now you can run the adapter from terminal. 
+Now you can run the adapter from terminal. The application *optionally* takes the following command line arguments:
 
-    ./build/bin/SilKitAdapterSocketCAN
-
-This command will run the adapter with default parameters: 
-    
-    can-name         : can0
-    registry-uri     : silkit://localhost:8501
-    participant-name : SocketCAN_silkit
-    network-name     : NETCAN0
-
-**Note:** Optionally, if you want to change the values of any of these parameters, you can run the adapter with the following optional command line arguments:
-
-    ./build/bin/SilKitAdapterSocketCAN [--can-name 'A'] [--registry-uri 'silkit://B:8501'] [--participant-name 'C'] [--network-name 'D']
-
-You may set the ``A``,``B``,``C``,``D`` values according to your preference.   
+    ./build/bin/SilKitAdapterSocketCAN [--can-name 'can0'] [--registry-uri 'silkit://localhost:8501'] [--participant-name 'SocketCAN_silkit'] [--network-name 'NETCAN0'] [--log 'Info']
 
 
 ## SocketCAN Demo
-The aim of this demo is to showcase a simple adapter forwarding CAN traffic from Linux terminal running a virtual CAN interface through to
+The aim of this demo is to showcase a simple adapter that forwards CAN traffic from Linux terminal running a virtual CAN interface through to
 Vector SIL Kit. 
 
 This demo is further explained in [SocketCAN/README.md](SocketCAN/README.md).
