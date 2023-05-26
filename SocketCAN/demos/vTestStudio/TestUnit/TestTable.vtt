@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--Vector Test Table Editor-->
+<ttroot version="26" xmlns="http://www.vector-informatik.de/ITE/TestTable/1.0">
+  <tt>
+    <capltestcase>
+      <title />
+      <name>testWaitForCAN_msg_ID</name>
+      <tcid>23a25260-756d-4d83-9ece-6ac04b7e6257</tcid>
+    </capltestcase>
+    <capltestcase>
+      <title />
+      <name>testWaitForCAN_msg_Content</name>
+      <tcid>f5b867fb-5ef8-4248-a6bd-f80b982fce18</tcid>
+    </capltestcase>
+    <capltestcase>
+      <title />
+      <name>testWaitForEcho_msg_ID</name>
+      <tcid>4690cab1-eef1-46a0-9d1a-cf023f1dfe01</tcid>
+    </capltestcase>
+    <capltestcase>
+      <title />
+      <name>testWaitForEcho_msg_Content</name>
+      <tcid>c4a87126-6202-45ee-8a1d-41838b7d5e51</tcid>
+    </capltestcase>
+  </tt>
+  <ttlib>
+    <ts_definitions />
+    <tc_definitions />
+    <function_definitions />
+  </ttlib>
+</ttroot>

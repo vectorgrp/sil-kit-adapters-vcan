@@ -6,4 +6,6 @@ Logging:
 CanControllers:
  - Name: "CAN"
    Network: "CAN1"
-	 
+
+Middleware:
+  RegistryUri: silkit://192.168.56.101:8501

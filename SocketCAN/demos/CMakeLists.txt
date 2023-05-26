@@ -1,1 +1,2 @@
-#add_subdirectory(EchoDevice)
+add_subdirectory(EchoDevice)
+

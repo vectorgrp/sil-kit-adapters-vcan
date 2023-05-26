@@ -1,7 +1,7 @@
 #!/bin/bash
 
-for i in {300..400}
+while true
 do
-cansend can0 $i#AAAABBBB
+cansend can0 001#AAAABBBB
 sleep 0.25
 done

@@ -35,7 +35,7 @@ To build the adapter, you'll need an ubuntu SIL Kit package ``SilKit-x.y.z-$ubun
 The adapters and demos are built using ``cmake``:
 
     mkdir build
-    cmake -S. -Bbuild -DSILKIT_PACKAGE_DIR=/path/to/SilKit-x.y.z-$ubuntu/
+    cmake -S. -Bbuild -DSILKIT_PACKAGE_DIR=/path/to/SilKit-x.y.z-$ubuntu/ -D CMAKE_BUILD_TYPE=Release
     cmake --build build --parallel
 
 The adapter executable will be available in ``build/bin`` (depending on the configured build directory).
