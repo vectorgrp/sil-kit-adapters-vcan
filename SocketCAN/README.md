@@ -1,4 +1,4 @@
-# SocketCAN Demo and Adapter Setup
+﻿# SocketCAN Demo and Adapter Setup
 This demo consists of SocketCAN interface `can0` which is connected to SIL Kit via `SilKitAdapterSocketCAN`, with the latter being a SIL Kit participant connected to `CAN1` SIL Kit network. 
 For demonstration purposes, another SIL Kit participant `CanEchoDevice` is connected to the same `CAN1` SIL Kit network.   
 
@@ -8,21 +8,21 @@ When all the connections are set up, a shell script is run to generate CAN paylo
 
 The following sketch shows the general setup: 
 
-    +-----[   Virtual CAN (Linux)  ]----------+                            +------[ SIL Kit Adapter SocketCAN ]------+
-    | -CAN payload generation                 | <= ---- SocketCAN  ---- => |      connecting SocketCAN can0 to       |
-    | -Sending & receiving on can0 interface  |                            |          SIL Kit CAN1 Network           |
-    +-----------------------------------------+                            +-----------------------------------------+
-                                                                                                <=>
-                                                                                       SIL Kit (CAN1 Network)
-                                                                                                <=>                 
-                                                                           +-----------[ SIL Kit Registry ]---------+
-    +--------------[ CanEchoDevice ]----------+                            |                                        |
-    |                                         |<=-SIL Kit (CAN1 Network)-=>|                                        |
-    +-----------------------------------------+                            |                                        |          
-    +--------------[ Vector CANoe ]-----------+                            |                                        |
-    |                                         |<=-SIL Kit (CAN1 Network)-=>|                                        |
-    +-----------------------------------------+                            +----------------------------------------+
-  
+    +------------[ Virtual CAN ]--------------+                      +-----[ SIL Kit Adapter SocketCAN ]-----+
+    |-CAN payload generation on [can0]        <----- SocketCAN ------>    connecting SocketCAN [can0] to     |
+    |-Sending & receiving on [can0] interface |                      |          SIL Kit [CAN1] Network       |
+    +-----------------------------------------+                      +------ʌ--------------------------------+
+                                                                            |            
+                                                                            |           
+                                                                     +------|------[ SIL Kit ]---------------+
+                                                                     |      |                                |
+                                                                     |  +---v---[ CAN1 Network ]----------+  |
+    +--------------[ CanEchoDevice ]----------+                      |  |                                 |  |
+    |                                         <----------------------|-->     Peer-to-peer connection     |  |
+    +-----------------------------------------+                      |  |     between participants on     |  |
+    +--------------[ Vector CANoe ]-----------+                      |  |     SIL Kit [CAN1] Network      |  |
+    |                                         <----------------------|-->                                 |  |
+    +-----------------------------------------+                      |  +---------------------------------+  |
 
 ## CanEchoDevice
 
