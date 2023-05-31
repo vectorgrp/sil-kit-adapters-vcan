@@ -59,7 +59,7 @@ It is also necessary that a virtual CAN interface is already opened and running 
 
 Now you can run the adapter from terminal. The application *optionally* takes the following command line arguments:
 
-    ./build/bin/SilKitAdapterSocketCAN [--can-name 'can0'] [--registry-uri 'silkit://localhost:8501'] [--participant-name 'SocketCAN_silkit'] [--network-name 'NETCAN0'] [--log 'Info']
+    ./build/bin/SilKitAdapterSocketCAN [--can-name 'can0'] [--registry-uri 'silkit://localhost:8501'] [--participant-name 'SocketCAN_silkit'] [--network-name 'CAN1'] [--log 'Info']
 
 
 ## SocketCAN Demo
