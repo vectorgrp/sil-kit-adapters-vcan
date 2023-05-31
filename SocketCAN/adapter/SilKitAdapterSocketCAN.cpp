@@ -5,7 +5,6 @@
 
 #include <linux/can.h>
 #include <linux/can/raw.h>
-#include <net/if.h>
 #include <unistd.h>
 
 #include <asio/posix/stream_descriptor.hpp>
@@ -116,10 +115,10 @@ inline can_frame SILKitToSocketCAN(const CanFrame& silkit_can_frame)
 {
     struct can_frame socketcan_frame;
     socketcan_frame.can_id = silkit_can_frame.canId;
-    socketcan_frame.len = silkit_can_frame.dlc;
+    socketcan_frame.can_dlc = silkit_can_frame.dlc;
     memset(&socketcan_frame.__pad, 0, sizeof(socketcan_frame.__pad)); // set padding to zero
     memset(&socketcan_frame.__res0, 0, sizeof(socketcan_frame.__res0)); // set reserved field to zero
-    socketcan_frame.len8_dlc = silkit_can_frame.dlc; // optional DLC for 8 byte payload length (9 .. 15)
+    //socketcan_frame.len8_dlc = silkit_can_frame.dlc; // optional DLC for 8 byte payload length (9 .. 15)
     memcpy(socketcan_frame.data, silkit_can_frame.dataField.data(), silkit_can_frame.dataField.size());
     return socketcan_frame;
 }
@@ -129,11 +128,11 @@ inline CanFrame SocketCANToSILKit(const struct can_frame& socketcan_frame)
     CanFrame silkit_frame;
     silkit_frame.canId = socketcan_frame.can_id;
     silkit_frame.flags = static_cast<CanFrameFlagMask>(socketcan_frame.can_id & CAN_EFF_FLAG); // get EFF/RTR/ERR flags
-    silkit_frame.dlc = socketcan_frame.len;
+    silkit_frame.dlc = socketcan_frame.can_dlc;
     silkit_frame.sdt = 0; // not used in SocketCAN
     silkit_frame.vcid = 0; // not used in SocketCAN
     silkit_frame.af = 0; // not used in SocketCAN
-    silkit_frame.dataField = SilKit::Util::Span<const uint8_t>(socketcan_frame.data, socketcan_frame.len);
+    silkit_frame.dataField = SilKit::Util::Span<const uint8_t>(socketcan_frame.data, socketcan_frame.can_dlc);
     return silkit_frame;
 }
 
@@ -181,7 +180,7 @@ int main(int argc, char** argv)
 
             if (logLvl.compare("Debug") == 0 || logLvl.compare("Trace") == 0)
             {
-                std::cout << "CAN device >> SIL Kit: CAN frame (dlc=" << (int)data.len << " bytes, txId=" << transmitId << ")" << std::endl;
+                std::cout << "CAN device >> SIL Kit: CAN frame (dlc=" << (int)data.can_dlc << " bytes, txId=" << transmitId << ")" << std::endl;
             }
         };
 
