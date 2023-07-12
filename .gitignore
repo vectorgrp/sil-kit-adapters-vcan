@@ -32,7 +32,6 @@
 *.app
 
 out/
-CMakePresets.json
 /out/
 /.vs/
 /build/
