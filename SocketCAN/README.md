@@ -70,11 +70,12 @@ After that, launch the SilKitAdapterSocketCAN
 You should see the following output in the terminal where the adapter was launched: 
 
     Creating participant 'SocketCAN_silkit' at silkit://localhost:8501
-    [date time] [SocketCAN_silkit] [info] Creating participant 'SocketCAN_silkit' at 'silkit://localhost:8501', SIL Kit version: 4.0.26
-    [date time] [SocketCAN_silkit] [info] Connected to registry at 'tcp://127.0.0.1:8501' via 'tcp://127.0.0.1:53722' (silkit://localhost:8501)
-    Creating CAN controller 'SocketCAN_silkit_CAN_CTRL'
-    Creating CAN device connector for 'can0'
-    vCAN device successfully opened
+    [date time] [SocketCAN_silkit] [info] Creating participant 'SocketCAN_silkit' at 'silkit://localhost:8501', SIL Kit version: 4.0.30
+    [date time] [SocketCAN_silkit] [info] Connected to registry at 'tcp://127.0.0.1:8501' via 'tcp://127.0.0.1:53856' (silkit://localhost:8501)
+    [date time] [SocketCAN_silkit] [info] Creating CAN controller 'SocketCAN_silkit_CAN_CTRL'
+    [date time] [SocketCAN_silkit] [info] Creating CAN device connector for 'can0'
+    [date time] [SocketCAN_silkit] [info] vCAN device successfully opened
+
 
 You should see also a `SocketCAN_silkit` participant announcement in the SIL Kit registry terminal
 

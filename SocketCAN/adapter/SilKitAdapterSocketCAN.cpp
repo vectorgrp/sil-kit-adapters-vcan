@@ -18,29 +18,34 @@
 #include <asio/ts/net.hpp>
 
 #include "Exceptions.hpp"
+#include "Parsing.hpp"
+
+#include "SilKitAdapterSocketCAN.hpp"
 
 using namespace std;
 using namespace SilKit::Services::Can;
+using namespace exceptions;
+using namespace adapters;
 
 class CanConnection
 {
 public:
     CanConnection(asio::io_context& io_context, const std::string& canDevName,
-                  std::function<void(can_frame)> onNewFrameHandler)
+                  std::function<void(can_frame)> onNewFrameHandler, SilKit::Services::Logging::ILogger* logger)
         : _canDeviceStream{io_context}
         , _onNewFrameHandler(std::move(onNewFrameHandler))
+        , _logger(logger)
     {
         _canDeviceStream.assign(GetCanDeviceFileDescriptor(canDevName.c_str()));
-        ReceiveCanFrameFromVirtualCanDevice();   
+        ReceiveCanFrameFromVirtualCanDevice();
     }
 
     void SendCanFrameToCanDevice(const can_frame& frame)
     {
-
         auto sizeSent = _canDeviceStream.write_some(asio::buffer(&frame, sizeof(frame)));
         if (sizeof(frame) != sizeSent)
         {
-            throw demo::InvalidFrameSizeError{};
+            throw exceptions::InvalidFrameSizeError{};
         }
     }
 
@@ -62,7 +67,7 @@ private:
         {
             strncpy(ifr.ifr_name, canDeviceName, IFNAMSIZ); // default is "can0"
         }
-       
+
         errorCode = ioctl(canFileDescriptor, SIOCGIFINDEX, reinterpret_cast<void*>(&ifr));
 
         if (errorCode < 0)
@@ -75,40 +80,43 @@ private:
         socketAddress.can_family = AF_CAN;
         socketAddress.can_ifindex = ifr.ifr_ifindex;
 
-         // Bind socket (link socketCAN File Descriptor to address)
+        // Bind socket (link socketCAN File Descriptor to address)
         /* Give the socket FD the local address ADDR (which is LEN bytes long).  */
         if (bind(canFileDescriptor, (struct sockaddr*)&socketAddress, sizeof(socketAddress)) < 0)
         {
             std::cerr << "Error in socket binding" << std::endl;
             return -2;
         }
-        
-        std::cout << "vCAN device successfully opened" << std::endl;
+
+        _logger->Info("vCAN device successfully opened");
         return canFileDescriptor;
     }
 
-    private:
+private:
     void ReceiveCanFrameFromVirtualCanDevice()
     {
-        _canDeviceStream.async_read_some( asio::buffer(&_canFrameBuffer, sizeof(_canFrameBuffer)),
-            [this](const std::error_code ec, const std::size_t bytes_received)
+        _canDeviceStream.async_read_some(asio::buffer(&_canFrameBuffer, sizeof(_canFrameBuffer)),
+            [this](const std::error_code ec, const std::size_t bytes_received) 
             {
                 if (ec)
                 {
-                    throw demo::IncompleteReadError{};
+                    throw exceptions::IncompleteReadError{};
                 }
                 auto frame_data = std::vector<std::uint8_t>(bytes_received);
                 can_frame CF;
-                asio::buffer_copy(asio::buffer(&CF, sizeof(CF)), asio::buffer(&_canFrameBuffer, sizeof(_canFrameBuffer)), bytes_received);
+                asio::buffer_copy(asio::buffer(&CF, sizeof(CF)),
+                                asio::buffer(&_canFrameBuffer, sizeof(_canFrameBuffer)),
+                                bytes_received);
                 _onNewFrameHandler(std::move(CF));
                 ReceiveCanFrameFromVirtualCanDevice();
             });
     }
-    
+
 private:
     asio::posix::basic_stream_descriptor<> _canDeviceStream;
     struct can_frame _canFrameBuffer;
     std::function<void(can_frame)> _onNewFrameHandler;
+    SilKit::Services::Logging::ILogger* _logger;
 };
 
 inline can_frame SILKitToSocketCAN(const CanFrame& silkit_can_frame)
@@ -136,81 +144,95 @@ inline CanFrame SocketCANToSILKit(const struct can_frame& socketcan_frame)
     return silkit_frame;
 }
 
+void promptForExit()
+{
+    std::cout << "Press enter to stop the process..." << std::endl;
+    std::cin.ignore();
+}
+
+template <class exception>
+void throwIf(bool b)
+{
+    if (b)
+        throw exception();
+}
+
+inline auto& throwInvalidCliIf = throwIf<InvalidCli>;
+
 int main(int argc, char** argv)
 {
-    const auto getArgDefault = [ argc, argv ](const std::string& argument, const std::string& defaultValue) -> auto
+    if (findArg(argc, argv, helpArg, argv) != NULL)
     {
-        return [argc, argv, argument, defaultValue]() -> std::string {
-            auto found = std::find_if(argv, argv + argc, [argument](const char* arg) -> bool {
-                return arg == argument;
-            });
+        print_help(true);
+        return NO_ERROR;
+    }
 
-            if (found != argv + argc && found + 1 != argv + argc)
-            {
-                return *(found + 1);
-            }
-            return defaultValue;
-        };
-    };
+    const std::string loglevel = getArgDefault(argc, argv, logLevelArg, "Info");
+    const std::string participantConfigurationString =
+        R"({ "Logging": { "Sinks": [ { "Type": "Stdout", "Level": ")" + loglevel + R"("} ] } })";
+    const std::string registryURI = getArgDefault(argc, argv, regUriArg, "silkit://localhost:8501");
 
-    const std::string canDevName = getArgDefault("--can-name", "can0")();
-    const std::string registryURI = getArgDefault("--registry-uri", "silkit://localhost:8501")();
-    const std::string participantName = getArgDefault("--participant-name", "SocketCAN_silkit")();
-    const std::string canNetworkName = getArgDefault("--network-name", "CAN1")();
+    const std::string canDevName = getArgDefault(argc, argv, canNameArg, "can0");
+    const std::string participantName = getArgDefault(argc, argv, participantNameArg, "SocketCAN_silkit");
+    const std::string canNetworkName = getArgDefault(argc, argv, networkArg, "CAN1");
     const std::string canControllerName = participantName + "_CAN_CTRL";
-    const std::string logLvl = getArgDefault("--log", "Info")();
-
-    const std::string participantConfigurationString = R"({ "Logging": { "Sinks": [ { "Type": "Stdout", "Level": "Info" } ] } })";
 
     asio::io_context io_context;
 
     try
     {
-        auto participantConfiguration = SilKit::Config::ParticipantConfigurationFromString(participantConfigurationString);
+        throwInvalidCliIf(thereAreUnknownArguments(argc, argv));
+
+        auto participantConfiguration =
+            SilKit::Config::ParticipantConfigurationFromString(participantConfigurationString);
+
         std::cout << "Creating participant '" << participantName << "' at " << registryURI << std::endl;
         auto participant = SilKit::CreateParticipant(participantConfiguration, participantName, registryURI);
 
-        std::cout << "Creating CAN controller '" << canControllerName << "'" << std::endl;
+        auto logger = participant->GetLogger();
+
+        std::ostringstream SILKitInfoMessage;
+        SILKitInfoMessage << "Creating CAN controller '" << canControllerName << "'";
+        logger->Info(SILKitInfoMessage.str());
         auto* canController = participant->CreateCanController(canControllerName, canNetworkName);
 
-        const auto onReceiveCanFrameFromCanDevice = [logLvl, canController](can_frame data) 
-        {
+        const auto onReceiveCanFrameFromCanDevice = [&logger, canController](can_frame data) {
             static intptr_t transmitId = 0;
             canController->SendFrame(SocketCANToSILKit(data), reinterpret_cast<void*>(++transmitId));
 
-            if (logLvl.compare("Debug") == 0 || logLvl.compare("Trace") == 0)
-            {
-                std::cout << "CAN device >> SIL Kit: CAN frame (dlc=" << (int)data.can_dlc << " bytes, txId=" << transmitId << ")" << std::endl;
-            }
+            std::ostringstream SILKitDebugMessage;
+            SILKitDebugMessage << "CAN device >> SIL Kit: CAN frame (dlc=" << (int)data.can_dlc << " bytes, txId=" << transmitId << ")" << " bytes, txId=" << transmitId << ")" << std::endl;
+            logger->Debug(SILKitDebugMessage.str());
         };
 
-        std::cout << "Creating CAN device connector for '" << canDevName << "'" << std::endl;
-        CanConnection canConnection{io_context, canDevName, onReceiveCanFrameFromCanDevice};
+        SILKitInfoMessage.str("");
+        SILKitInfoMessage << "Creating CAN device connector for '" << canDevName << "'";
+        logger->Info(SILKitInfoMessage.str());
+        CanConnection canConnection{io_context, canDevName, onReceiveCanFrameFromCanDevice, logger};
 
-        const auto onReceiveCanMessageFromSilKit = [logLvl, &canConnection](ICanController* /*controller*/, const CanFrameEvent& msg) {
+        const auto onReceiveCanMessageFromSilKit = [&logger, &canConnection](ICanController* /*controller*/, const CanFrameEvent& msg) {
             CanFrame recievedFrame = msg.frame;
             canConnection.SendCanFrameToCanDevice(SILKitToSocketCAN(recievedFrame));
 
-            if (logLvl.compare("Debug") == 0 || logLvl.compare("Trace") == 0)
-            {
-                std::cout << "SIL Kit >> CAN device: CAN frame (" << recievedFrame.dlc << " bytes)" << std::endl;
-            }
+            std::ostringstream SILKitDebugMessage;
+            SILKitDebugMessage << "SIL Kit >> CAN device: CAN frame (" << recievedFrame.dlc << " bytes)" << std::endl;
+            logger->Debug(SILKitDebugMessage.str());
         };
 
-        const auto onCanAckCallback = [logLvl](ICanController* /*controller*/, const CanFrameTransmitEvent& ack) {
-                if (logLvl.compare("Debug") == 0 || logLvl.compare("Trace") == 0)
-                {
-                    if (ack.status == CanTransmitStatus::Transmitted)
-                    {
-                        std::cout << "SIL Kit >> CAN : ACK for CAN Message with transmitId="
-                            << reinterpret_cast<intptr_t>(ack.userContext) << std::endl;
-                    }
-                    else
-                    {
-                        std::cout << "SIL Kit >> CAN : NACK for CAN Message with transmitId="
-                            << reinterpret_cast<intptr_t>(ack.userContext) << ": " << ack.status << std::endl;
-                    }
-                }
+        const auto onCanAckCallback = [&logger](ICanController* /*controller*/, const CanFrameTransmitEvent& ack) 
+        {
+            std::ostringstream SILKitDebugMessage;
+            if (ack.status == CanTransmitStatus::Transmitted)
+            {
+                SILKitDebugMessage << "SIL Kit >> CAN : ACK for CAN Message with transmitId="
+                                   << reinterpret_cast<intptr_t>(ack.userContext) << std::endl;
+            }
+            else
+            {
+                SILKitDebugMessage << "SIL Kit >> CAN : NACK for CAN Message with transmitId="
+                    << reinterpret_cast<intptr_t>(ack.userContext) << ": " << ack.status << std::endl;
+            }
+            logger->Debug(SILKitDebugMessage.str());
         };
 
         canController->AddFrameHandler(onReceiveCanMessageFromSilKit);
@@ -219,24 +241,27 @@ int main(int argc, char** argv)
 
         io_context.run();
 
-        std::cout << "Press enter to stop the process..." << std::endl;
-        std::cin.ignore();
-
+        promptForExit();
     }
     catch (const SilKit::ConfigurationError& error)
     {
         std::cerr << "Invalid configuration: " << error.what() << std::endl;
-        std::cout << "Press enter to stop the process..." << std::endl;
-        std::cin.ignore();
-        return -2;
+        promptForExit();
+        return CLI_ERROR;
+    }
+    catch (const InvalidCli&)
+    {
+        adapters::print_help();
+        std::cerr << std::endl << "Invalid command line arguments." << std::endl;
+        promptForExit();
+        return CLI_ERROR;
     }
     catch (const std::exception& error)
     {
         std::cerr << "Something went wrong: " << error.what() << std::endl;
-        std::cout << "Press enter to stop the process..." << std::endl;
-        std::cin.ignore();
-        return -3;
+        promptForExit();
+        return OTHER_ERROR;
     }
 
-    return 0;
+    return NO_ERROR;
 }

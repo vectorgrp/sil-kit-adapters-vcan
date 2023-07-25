@@ -57,10 +57,16 @@ It is also necessary that a virtual CAN interface is already opened and running 
 
 **Note:** These commands will open a virtual CAN interface with the name ``can0``.
 
-Now you can run the adapter from terminal. The application *optionally* takes the following command line arguments:
+Now you can run the adapter from terminal. 
 
-    ./build/bin/SilKitAdapterSocketCAN [--can-name 'can0'] [--registry-uri 'silkit://localhost:8501'] [--participant-name 'SocketCAN_silkit'] [--network-name 'CAN1'] [--log 'Info']
+The application *optionally* takes the following command line arguments:
 
+    ./build/bin/SilKitAdapterSocketCAN [--name <participant name{SocketCAN_silkit}>]
+                                       [--registry-uri silkit://<host{localhost}>:<port{8501}>]
+                                       [--log <Trace|Debug|Warn|{Info}|Error|Critical|off>]
+                                       [--can-name <vCAN device name{can0}>]
+                                       [--network <SIL Kit CAN network{CAN1}>]
+                                       [--help]
 
 ## SocketCAN Demo
 The aim of this demo is to showcase a simple adapter that forwards CAN traffic from Linux terminal running a virtual CAN interface through to

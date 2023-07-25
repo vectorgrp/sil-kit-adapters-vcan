@@ -4,7 +4,7 @@
 
 #include <stdexcept>
 
-namespace demo {
+namespace exceptions {
 
 struct IncompleteReadError : std::runtime_error
 {
@@ -54,4 +54,5 @@ struct InvalidIp4PacketError : std::runtime_error
     }
 };
 
-} // namespace demo
+} // namespace exceptions
+
