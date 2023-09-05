@@ -26,6 +26,7 @@ using namespace std;
 using namespace SilKit::Services::Can;
 using namespace exceptions;
 using namespace adapters;
+using namespace SilKit::Services::Orchestration;
 
 class CanConnection
 {
@@ -191,6 +192,21 @@ int main(int argc, char** argv)
 
         auto logger = participant->GetLogger();
 
+        auto* lifecycleService = participant->CreateLifecycleService({OperationMode::Autonomous});
+        auto* systemMonitor = participant->CreateSystemMonitor();
+        std::promise<void> runningStatePromise;
+
+        systemMonitor->AddParticipantStatusHandler(
+        [&runningStatePromise, participantName](const SilKit::Services::Orchestration::ParticipantStatus& status) {
+            if (participantName == status.participantName)
+            {
+                if (status.state == SilKit::Services::Orchestration::ParticipantState::Running)
+                {
+                    runningStatePromise.set_value();
+                }
+            }
+        });
+
         std::ostringstream SILKitInfoMessage;
         SILKitInfoMessage << "Creating CAN controller '" << canControllerName << "'";
         logger->Info(SILKitInfoMessage.str());
@@ -239,9 +255,34 @@ int main(int argc, char** argv)
         canController->AddFrameTransmitHandler(onCanAckCallback);
         canController->Start();
 
-        io_context.run();
+        auto finalStateFuture = lifecycleService->StartLifecycle();
+
+        std::thread t([&]() -> void {
+            io_context.run();
+        });
 
         promptForExit();
+
+        io_context.stop();
+        t.join();
+
+        auto runningStateFuture = runningStatePromise.get_future();
+        auto futureStatus = runningStateFuture.wait_for(15s);
+        if (futureStatus != std::future_status::ready)
+        {
+            std::cout
+                << "Lifecycle Service Stopping: timed out while checking if the participant is currently running.";
+            promptForExit();
+        }
+
+        lifecycleService->Stop("Adapter stopped by the user.");
+
+        auto finalState = finalStateFuture.wait_for(15s);
+        if (finalState != std::future_status::ready)
+        {
+            std::cout << "Lifecycle service stopping: timed out" << std::endl;
+            promptForExit();
+        }
     }
     catch (const SilKit::ConfigurationError& error)
     {
