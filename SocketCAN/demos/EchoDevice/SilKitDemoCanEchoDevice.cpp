@@ -11,8 +11,11 @@
 #include "silkit/services/can/string_utils.hpp"
 #include <asio/ts/buffer.hpp>
 #include "silkit/util/Span.hpp"
+#include "../adapter/Parsing.hpp"
+#include "../adapter/SilKitAdapterSocketCAN.hpp"
 
 using namespace SilKit::Services::Can;
+using namespace adapters;
 
 class Device
 {
@@ -77,16 +80,30 @@ void CanAckCallback(ICanController* /*controller*/, const CanFrameTransmitEvent&
  * Main Function
  **************************************************************************************************/
 
+inline auto& throwInvalidCliIf = throwIf<InvalidCli>;
+
 int main(int argc, char** argv)
 {
-    const std::string participantConfigurationString = R"({ "Logging": { "Sinks": [ { "Type": "Stdout", "Level": "Info" } ] } })";
-    const std::string participantName = "CanEchoDevice";
-    const std::string registryURI = "silkit://localhost:8501";
+    if (findArg(argc, argv, "--help", argv) != nullptr)
+    {
+        std::cout << "Usage (defaults in curly braces if you omit the switch):" << std::endl
+                  << "SilKitDemoCanEchoDevice [" << participantNameArg << " <participant's name{CanEchoDevice}>]\n"
+                     "  [" << regUriArg << " silkit://<host{localhost}>:<port{8501}>]\n"
+                     "  [" << networkArg << " <SIL Kit CAN network name{CAN1}>]\n"
+                     "  ["  << logLevelArg << " <Trace|Debug|Warn|{Info}|Error|Critical|off>]\n";
+    }
+
+    const std::string loglevel = getArgDefault(argc, argv, logLevelArg, "Info");
+    const std::string participantName = getArgDefault(argc, argv, participantNameArg, "CanEchoDevice");
+    const std::string registryURI = getArgDefault(argc, argv, regUriArg, "silkit://localhost:8501");
+    const std::string canNetworkName = getArgDefault(argc, argv, networkArg, "CAN1");
+
     const std::string canControllerName = participantName + "_CAN1";
-    const std::string canNetworkName = "CAN1";
+    const std::string participantConfigurationString = R"({ "Logging": { "Sinks": [ { "Type": "Stdout", "Level": ")" + loglevel + R"("} ] } })";
 
     try
     {
+        throwInvalidCliIf(thereAreUnknownArguments(argc, argv));
         auto participantConfiguration = SilKit::Config::ParticipantConfigurationFromString(participantConfigurationString);
         std::cout << "Creating participant '" << participantName << "' at " << registryURI << std::endl;
         auto participant = SilKit::CreateParticipant(participantConfiguration, participantName, registryURI);
@@ -120,17 +137,29 @@ int main(int argc, char** argv)
     {
         std::cerr << "Invalid configuration: " << error.what() << std::endl;
         std::cout << "Press enter to stop the process..." << std::endl;
+        std::cin.ignore();
+        return CONFIGURATION_ERROR;
+    }
+    catch (const InvalidCli&)
+    {
+        std::cout << "Usage (defaults in curly braces if you omit the switch):" << std::endl
+                  << "SilKitDemoCanEchoDevice [" << participantNameArg  << " <participant's name{CanEchoDevice}>]\n"
+                     "  ["  << regUriArg  << " silkit://<host{localhost}>:<port{8501}>]\n"
+                     "  ["  << networkArg << " <SIL Kit CAN network name{CAN1}>]\n"
+                     "  ["  << logLevelArg << " <Trace|Debug|Warn|{Info}|Error|Critical|off>]\n";
+
+        std::cerr << std::endl << "Invalid command line arguments." << std::endl;
         std::cout << "Press enter to stop the process..." << std::endl;
         std::cin.ignore();
-        return -2;
+        return CLI_ERROR;
     }
     catch (const std::exception& error)
     {
         std::cerr << "Something went wrong: " << error.what() << std::endl;
         std::cout << "Press enter to stop the process..." << std::endl;
         std::cin.ignore();
-        return -3;
+        return OTHER_ERROR;
     }
-    return 0;
+    return NO_ERROR;
 }
 

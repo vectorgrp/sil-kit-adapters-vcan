@@ -1,5 +1,6 @@
 add_executable(SilKitDemoCanEchoDevice
     "SilKitDemoCanEchoDevice.cpp"
+    ${CMAKE_SOURCE_DIR}/SocketCAN/adapter/Parsing.cpp
 )
 target_link_libraries(SilKitDemoCanEchoDevice
     PRIVATE

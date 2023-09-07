@@ -151,13 +151,6 @@ void promptForExit()
     std::cin.ignore();
 }
 
-template <class exception>
-void throwIf(bool b)
-{
-    if (b)
-        throw exception();
-}
-
 inline auto& throwInvalidCliIf = throwIf<InvalidCli>;
 
 int main(int argc, char** argv)
@@ -288,7 +281,7 @@ int main(int argc, char** argv)
     {
         std::cerr << "Invalid configuration: " << error.what() << std::endl;
         promptForExit();
-        return CLI_ERROR;
+        return CONFIGURATION_ERROR;
     }
     catch (const InvalidCli&)
     {
