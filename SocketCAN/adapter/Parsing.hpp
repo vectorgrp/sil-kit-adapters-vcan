@@ -96,6 +96,11 @@ extern const std::string networkArg;
 extern const std::string regUriArg;
 
 /// <summary>
+/// string containing the argument preceding the path to configuration file.
+/// </summary>
+extern const std::string configurationArg;
+
+/// <summary>
 /// string containing the argument preceding the logging verbosity level.
 /// </summary>
 extern const std::string logLevelArg;
@@ -109,9 +114,5 @@ extern const std::string participantNameArg;
 /// string containing the argument requesting the help message.
 /// </summary>
 extern const std::string helpArg;
-
-class InvalidCli : public std::exception
-{
-};
 
 } // namespace adapters

@@ -16,6 +16,7 @@
 
 using namespace SilKit::Services::Can;
 using namespace adapters;
+using namespace exceptions;
 
 class Device
 {
@@ -80,7 +81,6 @@ void CanAckCallback(ICanController* /*controller*/, const CanFrameTransmitEvent&
  * Main Function
  **************************************************************************************************/
 
-inline auto& throwInvalidCliIf = throwIf<InvalidCli>;
 
 int main(int argc, char** argv)
 {

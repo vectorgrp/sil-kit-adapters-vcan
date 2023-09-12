@@ -12,9 +12,12 @@ const std::string adapters::regUriArg = "--registry-uri";
 const std::string adapters::logLevelArg = "--log";
 const std::string adapters::participantNameArg = "--name";
 const std::string adapters::helpArg = "--help";
+const std::string adapters::configurationArg = "--configuration";
 
-const std::array<std::string, 5> switchesWithArgument = {adapters::networkArg, adapters::canNameArg, adapters::regUriArg,
-                                                         adapters::logLevelArg, adapters::participantNameArg};
+
+const std::array<std::string, 6> switchesWithArgument = {adapters::networkArg, adapters::canNameArg, adapters::regUriArg,          
+                                                        adapters::logLevelArg, adapters::participantNameArg, adapters::configurationArg};
+;
 
 const std::array<std::string, 1> switchesWithoutArguments = {adapters::helpArg};
 
@@ -50,10 +53,12 @@ void adapters::print_help(bool userRequested)
 {
     std::cout << "Usage (defaults in curly braces if you omit the switch):" << std::endl
               << "SilKitAdapterSocketCAN ["<<participantNameArg<<" <participant name{SocketCAN_silkit}>]\n"
+                 "  [" << configurationArg << " <path to .silkit.yaml or .json configuration file>]\n"
                  "  ["<<regUriArg<<" silkit://<host{localhost}>:<port{8501}>]\n"
                  "  ["<<logLevelArg<<" <Trace|Debug|Warn|{Info}|Error|Critical|off>]\n"
                  "  ["<<canNameArg<<" <vCAN device name{can0}>]\n"
-                 "  ["<<networkArg<<" <SIL Kit CAN network{CAN1}>]\n";
+                 "  ["<<networkArg<<" <SIL Kit CAN network{CAN1}>]\n"
+                 "SIL Kit-specific CLI arguments will be overwritten by the config file passed by " << configurationArg << ".\n";
     std::cout << "\n"
                  "Example:\n"
                  "SilKitAdapterSocketCAN "<<participantNameArg<<" vCAN_PARTICIPANT " <<  networkArg<<" CAN_NETWORK\n";

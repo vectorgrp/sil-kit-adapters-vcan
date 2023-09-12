@@ -4,13 +4,6 @@
 
 namespace adapters 
 {
-    template <class exception>
-    void throwIf(bool b)
-    {
-        if (b)
-            throw exception();
-    }
-
     enum ReturnCode
     {
         NO_ERROR = 0,

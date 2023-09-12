@@ -99,20 +99,19 @@ private:
     void ReceiveCanFrameFromVirtualCanDevice()
     {
         _canDeviceStream.async_read_some(asio::buffer(&_canFrameBuffer, sizeof(_canFrameBuffer)),
-            [this](const std::error_code ec, const std::size_t bytes_received) 
-            {
-                if (ec)
-                {
-                    throw exceptions::IncompleteReadError{};
-                }
-                auto frame_data = std::vector<std::uint8_t>(bytes_received);
-                can_frame CF;
-                asio::buffer_copy(asio::buffer(&CF, sizeof(CF)),
-                                asio::buffer(&_canFrameBuffer, sizeof(_canFrameBuffer)),
-                                bytes_received);
-                _onNewFrameHandler(std::move(CF));
-                ReceiveCanFrameFromVirtualCanDevice();
-            });
+                                         [this](const std::error_code ec, const std::size_t bytes_received) {
+                                             if (ec)
+                                             {
+                                                 throw exceptions::IncompleteReadError{};
+                                             }
+                                             auto frame_data = std::vector<std::uint8_t>(bytes_received);
+                                             can_frame CF;
+                                             asio::buffer_copy(asio::buffer(&CF, sizeof(CF)),
+                                                               asio::buffer(&_canFrameBuffer, sizeof(_canFrameBuffer)),
+                                                               bytes_received);
+                                             _onNewFrameHandler(std::move(CF));
+                                             ReceiveCanFrameFromVirtualCanDevice();
+                                         });
     }
 
 private:
@@ -153,8 +152,6 @@ void promptForExit()
     std::cin.ignore();
 }
 
-inline auto& throwInvalidCliIf = throwIf<InvalidCli>;
-
 int main(int argc, char** argv)
 {
     if (findArg(argc, argv, helpArg, argv) != NULL)
@@ -163,15 +160,12 @@ int main(int argc, char** argv)
         return NO_ERROR;
     }
 
-    const std::string loglevel = getArgDefault(argc, argv, logLevelArg, "Info");
-    const std::string participantConfigurationString =
-        R"({ "Logging": { "Sinks": [ { "Type": "Stdout", "Level": ")" + loglevel + R"("} ] } })";
+    const std::string configurationFile = getArgDefault(argc, argv, configurationArg, "");
     const std::string registryURI = getArgDefault(argc, argv, regUriArg, "silkit://localhost:8501");
+    const std::string participantName = getArgDefault(argc, argv, participantNameArg, "SilKitAdapterSocketCAN");
 
     const std::string canDevName = getArgDefault(argc, argv, canNameArg, "can0");
-    const std::string participantName = getArgDefault(argc, argv, participantNameArg, "SocketCAN_silkit");
     const std::string canNetworkName = getArgDefault(argc, argv, networkArg, "CAN1");
-    const std::string canControllerName = participantName + "_CAN_CTRL";
 
     asio::io_context io_context;
 
@@ -179,10 +173,41 @@ int main(int argc, char** argv)
     {
         throwInvalidCliIf(thereAreUnknownArguments(argc, argv));
 
-        auto participantConfiguration =
-            SilKit::Config::ParticipantConfigurationFromString(participantConfigurationString);
+        std::shared_ptr<SilKit::Config::IParticipantConfiguration> participantConfiguration;
 
-        std::cout << "Creating participant '" << participantName << "' at " << registryURI << std::endl;
+        if (!configurationFile.empty())
+        {
+            participantConfiguration = SilKit::Config::ParticipantConfigurationFromFile(configurationFile);
+
+            static const auto conflictualArguments = {
+                &logLevelArg,
+                /* others are correctly handled by SilKit if one is overwritten.*/};
+
+            for (const auto* conflictualArgument : conflictualArguments)
+            {
+                if (findArg(argc, argv, *conflictualArgument, argv) != NULL)
+                {
+                    auto configFileName = configurationFile;
+                    if (configurationFile.find_last_of("/\\") != std::string::npos)
+                    {
+                        configFileName = configurationFile.substr(configurationFile.find_last_of("/\\") + 1);
+                    }
+                    std::cout << "[info] Be aware that argument given with " << *conflictualArgument
+                              << " can be overwritten by a different value defined in the given configuration file "
+                              << configFileName << std::endl;
+                }
+            }
+        }
+        else
+        {
+            const std::string loglevel = getArgDefault(argc, argv, logLevelArg, "Info");
+            const std::string participantConfigurationString =
+                R"({ "Logging": { "Sinks": [ { "Type": "Stdout", "Level": ")" + loglevel + R"("} ] } })";
+            participantConfiguration = SilKit::Config::ParticipantConfigurationFromString(participantConfigurationString);
+        }
+
+        const std::string canControllerName = participantName + "_CAN_CTRL";
+
         auto participant = SilKit::CreateParticipant(participantConfiguration, participantName, registryURI);
 
         auto logger = participant->GetLogger();
@@ -192,15 +217,15 @@ int main(int argc, char** argv)
         std::promise<void> runningStatePromise;
 
         systemMonitor->AddParticipantStatusHandler(
-        [&runningStatePromise, participantName](const SilKit::Services::Orchestration::ParticipantStatus& status) {
-            if (participantName == status.participantName)
-            {
-                if (status.state == SilKit::Services::Orchestration::ParticipantState::Running)
+            [&runningStatePromise, participantName](const SilKit::Services::Orchestration::ParticipantStatus& status) {
+                if (participantName == status.participantName)
                 {
-                    runningStatePromise.set_value();
+                    if (status.state == SilKit::Services::Orchestration::ParticipantState::Running)
+                    {
+                        runningStatePromise.set_value();
+                    }
                 }
-            }
-        });
+            });
 
         std::ostringstream SILKitInfoMessage;
         SILKitInfoMessage << "Creating CAN controller '" << canControllerName << "'";
@@ -212,7 +237,9 @@ int main(int argc, char** argv)
             canController->SendFrame(SocketCANToSILKit(data), reinterpret_cast<void*>(++transmitId));
 
             std::ostringstream SILKitDebugMessage;
-            SILKitDebugMessage << "CAN device >> SIL Kit: CAN frame (dlc=" << (int)data.can_dlc << " bytes, txId=" << transmitId << ")" << " bytes, txId=" << transmitId << ")" << std::endl;
+            SILKitDebugMessage << "CAN device >> SIL Kit: CAN frame (dlc=" << (int)data.can_dlc
+                               << " bytes, txId=" << transmitId << ")"
+                               << " bytes, txId=" << transmitId << ")" << std::endl;
             logger->Debug(SILKitDebugMessage.str());
         };
 
@@ -222,7 +249,8 @@ int main(int argc, char** argv)
         SILKitInfoMessage << "Created CAN device connector for [" << canDevName << "] on network [" << canNetworkName << "]";
         logger->Info(SILKitInfoMessage.str());
 
-        const auto onReceiveCanMessageFromSilKit = [&logger, &canConnection](ICanController* /*controller*/, const CanFrameEvent& msg) {
+        const auto onReceiveCanMessageFromSilKit = [&logger, &canConnection](ICanController* /*controller*/,
+                                                                             const CanFrameEvent& msg) {
             CanFrame recievedFrame = msg.frame;
             canConnection.SendCanFrameToCanDevice(SILKitToSocketCAN(recievedFrame));
 
@@ -231,8 +259,7 @@ int main(int argc, char** argv)
             logger->Debug(SILKitDebugMessage.str());
         };
 
-        const auto onCanAckCallback = [&logger](ICanController* /*controller*/, const CanFrameTransmitEvent& ack) 
-        {
+        const auto onCanAckCallback = [&logger](ICanController* /*controller*/, const CanFrameTransmitEvent& ack) {
             std::ostringstream SILKitDebugMessage;
             if (ack.status == CanTransmitStatus::Transmitted)
             {
@@ -242,7 +269,7 @@ int main(int argc, char** argv)
             else
             {
                 SILKitDebugMessage << "SIL Kit >> CAN : NACK for CAN Message with transmitId="
-                    << reinterpret_cast<intptr_t>(ack.userContext) << ": " << ack.status << std::endl;
+                                   << reinterpret_cast<intptr_t>(ack.userContext) << ": " << ack.status << std::endl;
             }
             logger->Debug(SILKitDebugMessage.str());
         };

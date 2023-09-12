@@ -39,9 +39,10 @@ First, run the `OpenVCan_can0.sh` script in the Terminal, which will load the ne
 
 You should see this output that indicates that the `can0` virtual CAN device has been successfully launched:
     
-    Creating Virtual CAN interface with name [can0]
-    Verifying can0 interface state:
+    Device "can0" does not exist.
+    Creating [can0] interface.
     vCAN interface [can0] is up & running.
+
 
 Now, you can start sending virtual CAN frames from your terminal. 
 This can be done with the following command
@@ -65,21 +66,20 @@ Now is a good point to start the `sil-kit-registry`:
 
 After that, launch the SilKitAdapterSocketCAN
 
-    ./build/bin/SilKitAdapterSocketCAN
+    ./build/bin/SilKitAdapterSocketCAN --configuration ./SocketCAN/demos/SilKitConfig_Adapter.silkit.yaml
 
 You should see the following output in the terminal where the adapter was launched: 
 
-    Creating participant 'SocketCAN_silkit' at silkit://localhost:8501
-    [date time] [SocketCAN_silkit] [info] Creating participant 'SocketCAN_silkit' at 'silkit://localhost:8501', SIL Kit version: 4.0.34
-    [date time] [SocketCAN_silkit] [info] Connected to registry at 'tcp://127.0.0.1:8501' via 'tcp://127.0.0.1:55660' (silkit://localhost:8501)
-    [date time] [SocketCAN_silkit] [info] Creating CAN controller 'SocketCAN_silkit_CAN_CTRL'
-    [date time] [SocketCAN_silkit] [info] vCAN device [can0] successfully opened
-    [date time] [SocketCAN_silkit] [info] Created CAN device connector for [can0] on network [CAN1]
+    [date time] [SilKitAdapterSocketCAN] [info] Creating participant 'SilKitAdapterSocketCAN' at 'silkit://localhost:8501', SIL Kit version: 4.0.35
+    [date time] [SilKitAdapterSocketCAN] [info] Connected to registry at 'tcp://127.0.0.1:8501' via 'tcp://127.0.0.1:38226' (silkit://localhost:8501)
+    [date time] [SilKitAdapterSocketCAN] [info] Creating CAN controller 'SilKitAdapterSocketCAN_CAN_CTRL'
+    [date time] [SilKitAdapterSocketCAN] [info] Creating CAN device connector for 'can0'
+    [date time] [SilKitAdapterSocketCAN] [info] vCAN device successfully opened
     Press enter to stop the process...
 
-You should see also a `SocketCAN_silkit` participant announcement in the SIL Kit registry terminal
+You should see also a `SilKitAdapterSocketCAN` participant announcement in the SIL Kit registry terminal
 
-    [date time] [SilKitRegistry] [info] Sending known participant message to SocketCAN_silkit
+    [date time] [SilKitRegistry] [info] Sending known participant message to SilKitAdapterSocketCAN
 
 In a separate Terminal, launch the CanEchoDevice
 
@@ -88,7 +88,7 @@ In a separate Terminal, launch the CanEchoDevice
 You should see the following output in the terminal after launching the CanEchoDevice:
 
     Creating participant 'CanEchoDevice' at silkit://localhost:8501
-    [date time] [CanEchoDevice] [info] Creating participant 'CanEchoDevice' at 'silkit://localhost:8501', SIL Kit version: 4.0.26
+    [date time] [CanEchoDevice] [info] Creating participant 'CanEchoDevice' at 'silkit://localhost:8501', SIL Kit version: 4.0.35
     [date time] [CanEchoDevice] [info] Connected to registry at 'tcp://127.0.0.1:8501' via 'tcp://127.0.0.1:57750' (silkit://localhost:8501)
     Creating CAN controller 'CanEchoDevice_CAN1'
     Press enter to stop the process...

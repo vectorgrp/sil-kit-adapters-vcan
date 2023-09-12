@@ -1,0 +1,11 @@
+Description: Configuration for Adapter participant for SIL Kit Adapter vCAN demo
+ParticipantName: SilKitAdapterSocketCAN
+CanControllers:
+- Name: SilKitAdapterSocketCAN_CAN_CTRL
+  Network: CAN1
+Middleware:
+  RegistryUri: silkit://localhost:8501
+Logging:
+  Sinks:
+  - Type: Stdout
+    Level: Debug
