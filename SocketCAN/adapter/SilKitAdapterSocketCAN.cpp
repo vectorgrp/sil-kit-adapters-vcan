@@ -88,8 +88,10 @@ private:
             std::cerr << "Error in socket binding" << std::endl;
             return -2;
         }
+        
+        std::string logMsg = "vCAN device [" + std::string(canDeviceName) + "] successfully opened";
+        _logger->Info(logMsg);
 
-        _logger->Info("vCAN device successfully opened");
         return canFileDescriptor;
     }
 
@@ -214,10 +216,11 @@ int main(int argc, char** argv)
             logger->Debug(SILKitDebugMessage.str());
         };
 
-        SILKitInfoMessage.str("");
-        SILKitInfoMessage << "Creating CAN device connector for '" << canDevName << "'";
-        logger->Info(SILKitInfoMessage.str());
         CanConnection canConnection{io_context, canDevName, onReceiveCanFrameFromCanDevice, logger};
+
+        SILKitInfoMessage.str("");
+        SILKitInfoMessage << "Created CAN device connector for [" << canDevName << "] on network [" << canNetworkName << "]";
+        logger->Info(SILKitInfoMessage.str());
 
         const auto onReceiveCanMessageFromSilKit = [&logger, &canConnection](ICanController* /*controller*/, const CanFrameEvent& msg) {
             CanFrame recievedFrame = msg.frame;
