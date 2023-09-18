@@ -8,33 +8,14 @@ variables
 {
   int result_ID;
   int result_Message;
-  //char netName[10] = "CAN 1";
   dword timeout = 2000; 
-  byte msgData[8]; // standard CAN fram max size 
   
   message 100 ExpectedSocketCANFrame = {byte(0) = 0xAA, byte(1) = 0xAA, byte(2) = 0xBB, byte(3) = 0xBB};
   message 101 ExpectedEchoCANFrame = {byte(0) = 0xAA, byte(1) = 0xBB, byte(2) = 0xBB, byte(3) = 0x00};
 
-  
   dword SocketCAN_ID = 1;
   dword CANEchoDevice_ID = 2;
-  
-  //message CAN1.* SocketCAN_message;
-  //message CAN1.* CANEchoDevice_message;
-  
 }
-
-/*on message CAN1.*
-{
-  if(this.dir != rx) return; //make sure msg has been received, otherwise return
-  
-  if(this.id == SocketCAN_ID)
-    SocketCAN_message = this;
-  else if (this.id == CANEchoDevice_ID)
-    CANEchoDevice_message = this;
-  else
-    return;
-}*/
 
 void CheckTestResult(char testName[], int result)
 {
