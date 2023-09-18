@@ -1,17 +1,18 @@
 # Vector SIL Kit Adapter for SocketCAN (Linux only)
 This collection of software is provided to illustrate how the [Vector SIL Kit](https://github.com/vectorgrp/sil-kit/)
-can be attached to a virtual CAN (Controller Area Network) interface [[SocketCAN]](https://docs.kernel.org/networking/can.html) running in Linux kernel.
+can be attached to a virtual CAN (Controller Area Network) interface [SocketCAN](https://docs.kernel.org/networking/can.html) running in Linux kernel.
 
 This repository contains instructions to build the adapter and set up a minimal working development environment.
 
 The main contents are working examples of necessary software to connect the running system to a SIL Kit environment,
 as well as complimentary demo applications for some communication to happen.
 
-## Getting Started
 Those instructions assume you use a Linux OS (or a virtual machine running a Linux image) for building and running the adapter and use ``bash`` as your interactive
 shell. 
 
 **Note:** WSL/WSL2 are excluded from this context as their standard kernels don't support SocketCAN.   
+
+## a) Getting Started with self-build Adapter and Demos
 
 This section specifies steps you should do if you have just cloned the repository.
 
@@ -38,10 +39,19 @@ The adapters and demos are built using ``cmake``:
     cmake -S. -Bbuild -DSILKIT_PACKAGE_DIR=/path/to/SilKit-x.y.z-$ubuntu/ -D CMAKE_BUILD_TYPE=Release
     cmake --build build --parallel
 
+**Note 1:** If you have installed a self-built version of SIL Kit, you can build the adapter against it by setting SILKIT_PACKAGE_DIR to the installation path, where the bin, include and lib directories are.
+
+**Note 2:** If you don't provide a specific path for SILKIT_PACKAGE_DIR, a SIL Kit release package (SilKit-4.0.28-ubuntu-18.04-x86_64-gcc) will be fetched from github.com and the adapter will be built against it.
+
 The adapter executable will be available in ``build/bin`` (depending on the configured build directory).
 Additionally the ``SilKit`` shared object (e.g., ``libSilKitd.so``) is copied to that directory automatically.
 
-### Run the SilKitAdapterSocketCAN
+## b) Getting Started with pre-built Adapter and Demos
+Download a preview or a release of the Adapter directly from [Vector SIL Kit Adapters Releases](https://github.com/vectorgrp/sil-kit-adapters-vcan/releases).
+
+You should also download a SIL Kit Release directly from [Vector SIL Kit Releases](https://github.com/vectorgrp/sil-kit/releases). You will need this for being able to start a sil-kit-registry.
+
+## Run the SilKitAdapterSocketCAN
 This application allows the user to attach virtual CAN interfaces (``SocketCAN``) running in Linux environment to the
 SIL Kit.
 
