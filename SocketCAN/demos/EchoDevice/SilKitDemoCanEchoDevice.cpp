@@ -63,34 +63,38 @@ private:
     std::function<void(CanFrame)> _sendFrameCallback;
 };
 
-void CanAckCallback(ICanController* /*controller*/, const CanFrameTransmitEvent& ack)
+void promptForExit()
 {
-    if (ack.status == CanTransmitStatus::Transmitted)
-    {
-        std::cout << "SIL Kit >> Demo : ACK for CAN Message with transmitId="
-            << reinterpret_cast<intptr_t>(ack.userContext) << std::endl;
-    }
-    else
-    {
-        std::cout << "SIL Kit >> Demo : NACK for CAN Message with transmitId="
-            << reinterpret_cast<intptr_t>(ack.userContext) << ": " << ack.status << std::endl;
-    }
+    std::cout << "Press enter to stop the process..." << std::endl;
+    std::cin.ignore();
 }
 
-/**************************************************************************************************
+void print_demo_help(bool userRequested)
+{
+    std::cout << "Usage (defaults in curly braces if you omit the switch):" << std::endl;
+    std::cout << "SilKitDemoCanEchoDevice [" << participantNameArg << " <participant's name{CanEchoDevice}>]\n"
+        "  [" << regUriArg << " silkit://<host{localhost}>:<port{8501}>]\n"
+        "  [" << networkArg << " <SIL Kit CAN network name{CAN1}>]\n"
+        "  [" << logLevelArg << " <Trace|Debug|Warn|{Info}|Error|Critical|Off>]\n";
+        std::cout << "\n"
+        "Example:\n"
+        "SilKitDemoCanEchoDevice " << participantNameArg << " EchoDevice " << networkArg << " CAN_NETWORK " << logLevelArg << " Off\n ";
+
+    if (!userRequested)
+        std::cout << "\n"
+            "Pass "<<helpArg<<" to get this message.\n";
+}
+
+ /**************************************************************************************************
  * Main Function
  **************************************************************************************************/
-
 
 int main(int argc, char** argv)
 {
     if (findArg(argc, argv, "--help", argv) != nullptr)
     {
-        std::cout << "Usage (defaults in curly braces if you omit the switch):" << std::endl
-                  << "SilKitDemoCanEchoDevice [" << participantNameArg << " <participant's name{CanEchoDevice}>]\n"
-                     "  [" << regUriArg << " silkit://<host{localhost}>:<port{8501}>]\n"
-                     "  [" << networkArg << " <SIL Kit CAN network name{CAN1}>]\n"
-                     "  ["  << logLevelArg << " <Trace|Debug|Warn|{Info}|Error|Critical|off>]\n";
+        print_demo_help(true);
+        return NO_ERROR;
     }
 
     const std::string loglevel = getArgDefault(argc, argv, logLevelArg, "Info");
@@ -105,33 +109,55 @@ int main(int argc, char** argv)
     {
         throwInvalidCliIf(thereAreUnknownArguments(argc, argv));
         auto participantConfiguration = SilKit::Config::ParticipantConfigurationFromString(participantConfigurationString);
-        std::cout << "Creating participant '" << participantName << "' at " << registryURI << std::endl;
         auto participant = SilKit::CreateParticipant(participantConfiguration, participantName, registryURI);
+        
+        auto logger = participant->GetLogger();
 
-        std::cout << "Creating CAN controller '" << canControllerName << "'" << std::endl;
+        std::ostringstream SILKitInfoMessage;
+        SILKitInfoMessage << "Creating CAN controller '" << canControllerName << "'";
+        logger->Info(SILKitInfoMessage.str());
         auto* canController = participant->CreateCanController(canControllerName, canNetworkName);
 
-        auto demoDevice = Device{ canControllerName, canNetworkName,[canController](CanFrame data) 
+        auto demoDevice = Device{ canControllerName, canNetworkName,[&logger, canController](CanFrame data) 
                                 {
                                     static intptr_t transmitId = 0;
                                     canController->SendFrame(CanFrame{ std::move(data) }, reinterpret_cast<void*>(++transmitId));
-                                    std::cout << "Demo >> SIL Kit : CAN frame (dlc=" << (int)data.dlc << " bytes, txId=" << transmitId << ")" << std::endl;
+                                    
+                                    std::ostringstream SILKitDebugMessage;
+                                    SILKitDebugMessage << "Demo >> SIL Kit : CAN frame (dlc=" << (int)data.dlc << " bytes, txId=" << transmitId << ")" << std::endl;
+                                    logger->Debug(SILKitDebugMessage.str());
                                 }};
 
-        auto receiver_frameHandler = [&demoDevice](ICanController* /*controller*/, const CanFrameEvent& msg) 
+        auto onReceiveCanMessageFromSilKit = [&logger, &demoDevice](ICanController* /*controller*/, const CanFrameEvent& msg) 
         {
-            std::cout << "SIL Kit >> Demo: CAN frame (" << msg.frame.dlc << " bytes)" << std::endl;
+            std::ostringstream SILKitDebugMessage;
+
+            SILKitDebugMessage << "SIL Kit >> Demo: CAN frame (" << msg.frame.dlc << " bytes)" << std::endl;
+            logger->Debug(SILKitDebugMessage.str());
             std::vector<uint8_t> payloadBytes(msg.frame.dataField.data(), msg.frame.dataField.data() + msg.frame.dlc); 
             demoDevice.Process(std::move(msg.frame));
         };
-    
-        canController->AddFrameHandler(receiver_frameHandler);
-        canController->AddFrameTransmitHandler(&CanAckCallback);
+
+        const auto onCanAckCallback = [&logger](ICanController* /*controller*/, const CanFrameTransmitEvent& ack) {
+            std::ostringstream SILKitDebugMessage;
+            if (ack.status == CanTransmitStatus::Transmitted)
+            {
+                SILKitDebugMessage << "SIL Kit >> CAN : ACK for CAN Message with transmitId="
+                                   << reinterpret_cast<intptr_t>(ack.userContext) << std::endl;
+            }
+            else
+            {
+                SILKitDebugMessage << "SIL Kit >> CAN : NACK for CAN Message with transmitId="
+                                   << reinterpret_cast<intptr_t>(ack.userContext) << ": " << ack.status << std::endl;
+            }
+            logger->Debug(SILKitDebugMessage.str());
+        };
+
+        canController->AddFrameHandler(onReceiveCanMessageFromSilKit);
+        canController->AddFrameTransmitHandler(onCanAckCallback);
         canController->Start();
 
-        std::cout << "Press enter to stop the process..." << std::endl;
-        std::cin.ignore();
-
+        promptForExit();
     }
     catch (const SilKit::ConfigurationError& error)
     {
@@ -142,12 +168,7 @@ int main(int argc, char** argv)
     }
     catch (const InvalidCli&)
     {
-        std::cout << "Usage (defaults in curly braces if you omit the switch):" << std::endl
-                  << "SilKitDemoCanEchoDevice [" << participantNameArg  << " <participant's name{CanEchoDevice}>]\n"
-                     "  ["  << regUriArg  << " silkit://<host{localhost}>:<port{8501}>]\n"
-                     "  ["  << networkArg << " <SIL Kit CAN network name{CAN1}>]\n"
-                     "  ["  << logLevelArg << " <Trace|Debug|Warn|{Info}|Error|Critical|off>]\n";
-
+        print_demo_help(false);
         std::cerr << std::endl << "Invalid command line arguments." << std::endl;
         std::cout << "Press enter to stop the process..." << std::endl;
         std::cin.ignore();

@@ -51,20 +51,21 @@ bool adapters::thereAreUnknownArguments(int argc, char** argv)
 
 void adapters::print_help(bool userRequested)
 {
-    std::cout << "Usage (defaults in curly braces if you omit the switch):" << std::endl
-              << "SilKitAdapterSocketCAN ["<<participantNameArg<<" <participant name{SocketCAN_silkit}>]\n"
-                 "  [" << configurationArg << " <path to .silkit.yaml or .json configuration file>]\n"
-                 "  ["<<regUriArg<<" silkit://<host{localhost}>:<port{8501}>]\n"
-                 "  ["<<logLevelArg<<" <Trace|Debug|Warn|{Info}|Error|Critical|off>]\n"
-                 "  ["<<canNameArg<<" <vCAN device name{can0}>]\n"
-                 "  ["<<networkArg<<" <SIL Kit CAN network{CAN1}>]\n"
-                 "SIL Kit-specific CLI arguments will be overwritten by the config file passed by " << configurationArg << ".\n";
+    std::cout << "Usage (defaults in curly braces if you omit the switch):" << std::endl;
+    std::cout << "SilKitAdapterSocketCAN ["<<participantNameArg<<" <participant name{SocketCAN_silkit}>]\n"
+        "  [" << configurationArg << " <path to .silkit.yaml or .json configuration file>]\n"
+        "  ["<<regUriArg<<" silkit://<host{localhost}>:<port{8501}>]\n"
+        "  ["<<logLevelArg<<" <Trace|Debug|Warn|{Info}|Error|Critical|Off>]\n"
+        "  ["<<canNameArg<<" <vCAN device name{can0}>]\n"
+        "  ["<<networkArg<<" <SIL Kit CAN network{CAN1}>]\n"
+        "SIL Kit-specific CLI arguments will be overwritten by the config file passed by " << configurationArg << ".\n";
     std::cout << "\n"
-                 "Example:\n"
-                 "SilKitAdapterSocketCAN "<<participantNameArg<<" vCAN_PARTICIPANT " <<  networkArg<<" CAN_NETWORK\n";
+        "Example:\n"
+        "SilKitAdapterSocketCAN "<<participantNameArg<<" vCAN_PARTICIPANT " <<  networkArg<<" CAN_NETWORK\n";
+  
     if (!userRequested)
         std::cout << "\n"
-                     "Pass "<<helpArg<<" to get this message.\n";
+            "Pass "<<helpArg<<" to get this message.\n";
 };
 
 char** adapters::findArg(int argc, char** argv, const std::string& argument, char** args)

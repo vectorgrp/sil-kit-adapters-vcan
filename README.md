@@ -74,7 +74,7 @@ The application *optionally* takes the following command line arguments:
     ./build/bin/SilKitAdapterSocketCAN [--name <participant name{SilKitAdapterSocketCAN}>]
                                        [--configuration <path to .silkit.yaml or .json configuration file>]
                                        [--registry-uri silkit://<host{localhost}>:<port{8501}>]
-                                       [--log <Trace|Debug|Warn|{Info}|Error|Critical|off>]
+                                       [--log <Trace|Debug|Warn|{Info}|Error|Critical|Off>]
                                        [--can-name <vCAN device name{can0}>]
                                        [--network <SIL Kit CAN network{CAN1}>]
                                        [--help]
