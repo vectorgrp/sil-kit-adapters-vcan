@@ -92,21 +92,12 @@ In a separate Terminal, launch the CanEchoDevice
 You should see the following output in the terminal after launching the CanEchoDevice:
 
     Creating participant 'CanEchoDevice' at silkit://localhost:8501
-    [date time] [CanEchoDevice] [info] Creating participant 'CanEchoDevice' at 'silkit://localhost:8501', SIL Kit version: 4.0.35
-    [date time] [CanEchoDevice] [info] Connected to registry at 'tcp://127.0.0.1:8501' via 'tcp://127.0.0.1:57750' (silkit://localhost:8501)
-    Creating CAN controller 'CanEchoDevice_CAN1'
+    [date time] [CanEchoDevice] [info] Creating participant 'CanEchoDevice' at 'silkit://localhost:8501', SIL Kit version: 4.0.36
+    [date time] [CanEchoDevice] [info] Connected to registry at 'tcp://127.0.0.1:8501' via 'tcp://127.0.0.1:35464' (silkit://localhost:8501)
+    [date time] [CanEchoDevice] [info] Creating CAN controller 'CanEchoDevice_CAN1'
     Press enter to stop the process...
-    SIL Kit >> Demo: CAN frame (4 bytes)
-    SIL Kit >> Demo : ACK for CAN Message with transmitId=1
-    Demo >> SIL Kit : CAN frame (dlc=4 bytes, txId=1)
-    SIL Kit >> Demo: CAN frame (4 bytes)
-    SIL Kit >> Demo : ACK for CAN Message with transmitId=2
-    Demo >> SIL Kit : CAN frame (dlc=4 bytes, txId=2)
-    SIL Kit >> Demo: CAN frame (4 bytes)
-    SIL Kit >> Demo : ACK for CAN Message with transmitId=3
-    Demo >> SIL Kit : CAN frame (dlc=4 bytes, txId=3)
-    . 
-    . 
+
+**Note:** You can launch `SilKitDemoCanEchoDevice` with `--log Debug` argument if you want to see the CAN payload traffic logs. 
 
 You should also see a `CanEchoDevice` participant announcement in the SIL Kit registry terminal:
 
