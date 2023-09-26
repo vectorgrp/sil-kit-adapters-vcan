@@ -13,13 +13,13 @@ $canoe4sw_se_install_dir = $env:CANoe4SWSE_InstallDir64
 & $canoe4sw_se_install_dir/environment-make.exe "$PSScriptRoot/venvironment.yaml"  -o "$PSScriptRoot" -A "Linux64"
 
 #compile test unit
-& $canoe4sw_se_install_dir/test-unit-make.exe "$PSScriptRoot/../vTestStudio/TestUnit" -e "$PSScriptRoot/Default.venvironment" -o "$PSScriptRoot"
+& $canoe4sw_se_install_dir/test-unit-make.exe "$PSScriptRoot/../vTESTstudio/TestUnit" -e "$PSScriptRoot/Default.venvironment" -o "$PSScriptRoot"
 
 if ($remote) 
 {
 	# remote machine and paths configuration  
 	$remote_username="isma"
-	$remote_ip="192.168.56.101"
+	$remote_ip="192.168.56.102"
 	$remote_SKA_base_path="/home/isma/vfs/sil-kit-adapters-vcan"
 	$artifacts_subdirectory = "SocketCAN/demos/CANoe4SW_SE"
 	$remote_full_path = Join-Path -Path $remote_SKA_base_path -ChildPath $artifacts_subdirectory
