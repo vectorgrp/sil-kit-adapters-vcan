@@ -41,7 +41,7 @@ The adapters and demos are built using ``cmake``:
 
 **Note 1:** If you have installed a self-built version of SIL Kit, you can build the adapter against it by setting SILKIT_PACKAGE_DIR to the installation path, where the bin, include and lib directories are.
 
-**Note 2:** If you don't provide a specific path for SILKIT_PACKAGE_DIR, a SIL Kit release package (SilKit-4.0.28-ubuntu-18.04-x86_64-gcc) will be fetched from github.com and the adapter will be built against it.
+**Note 2:** If you don't provide a specific path for SILKIT_PACKAGE_DIR, a SIL Kit release package (the default version listed in CMakeLists.txt) will be fetched from github.com and the adapter will be built against it.
 
 The adapter executable will be available in ``build/bin`` (depending on the configured build directory).
 Additionally the ``SilKit`` shared object (e.g., ``libSilKitd.so``) is copied to that directory automatically.
