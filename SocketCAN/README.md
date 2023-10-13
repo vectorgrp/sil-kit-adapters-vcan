@@ -154,11 +154,11 @@ You can read data that is available on the `can0` vCAN device
     candump can0
 
 If the CanEchoDevice is running along with the SilKitAdapterSocketCAN, you should see output similar to the following in the terminal:
-    
-  can0  0C8   [4]  87 65 43 21
-  can0  0C9   [4]  65 43 21 00
-  can0  0C8   [4]  87 65 43 21
-  can0  0C9   [4]  65 43 21 00
+ 
+    can0  0C8   [4]  87 65 43 21
+    can0  0C9   [4]  65 43 21 00
+    can0  0C8   [4]  87 65 43 21
+    can0  0C9   [4]  65 43 21 00
     . 
     .
 

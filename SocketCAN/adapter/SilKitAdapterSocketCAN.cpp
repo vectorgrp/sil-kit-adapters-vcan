@@ -234,12 +234,12 @@ int main(int argc, char** argv)
 
         const auto onReceiveCanFrameFromCanDevice = [&logger, canController](can_frame data) {
             static intptr_t transmitId = 0;
-            canController->SendFrame(SocketCANToSILKit(data), reinterpret_cast<void*>(++transmitId));
+            canController->SendFrame(SocketCANToSILKit(data), reinterpret_cast<void*>(transmitId++));
 
             std::ostringstream SILKitDebugMessage;
-            SILKitDebugMessage << "CAN device >> SIL Kit: CAN frame (dlc=" << (int)data.can_dlc
-                               << " bytes, txId=" << transmitId << ")"
-                               << " bytes, txId=" << transmitId << ")" << std::endl;
+
+            SILKitDebugMessage << "CAN device >> SIL Kit: CAN frame (dlc=" <<  static_cast<int>(data.can_dlc) << ", CAN ID=0x"
+                               << std::hex << static_cast<int>(data.can_id) << std::dec << ", txId=" << transmitId << ")";
             logger->Debug(SILKitDebugMessage.str());
         };
 
@@ -263,13 +263,11 @@ int main(int argc, char** argv)
             std::ostringstream SILKitDebugMessage;
             if (ack.status == CanTransmitStatus::Transmitted)
             {
-                SILKitDebugMessage << "SIL Kit >> CAN : ACK for CAN Message with transmitId="
-                                   << reinterpret_cast<intptr_t>(ack.userContext) << std::endl;
+                SILKitDebugMessage << "SIL Kit >> CAN : ACK for CAN Message with transmitId=" << reinterpret_cast<intptr_t>(ack.userContext);
             }
             else
             {
-                SILKitDebugMessage << "SIL Kit >> CAN : NACK for CAN Message with transmitId="
-                                   << reinterpret_cast<intptr_t>(ack.userContext) << ": " << ack.status << std::endl;
+                SILKitDebugMessage << "SIL Kit >> CAN : NACK for CAN Message with transmitId=" << reinterpret_cast<intptr_t>(ack.userContext) << ": " << ack.status;
             }
             logger->Debug(SILKitDebugMessage.str());
         };
