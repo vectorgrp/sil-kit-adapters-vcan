@@ -85,12 +85,12 @@ private:
         /* Give the socket FD the local address ADDR (which is LEN bytes long).  */
         if (bind(canFileDescriptor, (struct sockaddr*)&socketAddress, sizeof(socketAddress)) < 0)
         {
-            std::cerr << "Error in socket binding" << std::endl;
+            _logger->Error("Error in socket binding");
             return -2;
         }
         
-        std::string logMsg = "vCAN device [" + std::string(canDeviceName) + "] successfully opened";
-        _logger->Info(logMsg);
+        std::string SILKitInfoMessage = "vCAN device [" + std::string(canDeviceName) + "] successfully opened";
+        _logger->Info(SILKitInfoMessage);
 
         return canFileDescriptor;
     }
@@ -99,19 +99,33 @@ private:
     void ReceiveCanFrameFromVirtualCanDevice()
     {
         _canDeviceStream.async_read_some(asio::buffer(&_canFrameBuffer, sizeof(_canFrameBuffer)),
-                                         [this](const std::error_code ec, const std::size_t bytes_received) {
-                                             if (ec)
-                                             {
-                                                 throw exceptions::IncompleteReadError{};
-                                             }
-                                             auto frame_data = std::vector<std::uint8_t>(bytes_received);
-                                             can_frame CF;
-                                             asio::buffer_copy(asio::buffer(&CF, sizeof(CF)),
-                                                               asio::buffer(&_canFrameBuffer, sizeof(_canFrameBuffer)),
-                                                               bytes_received);
-                                             _onNewFrameHandler(std::move(CF));
-                                             ReceiveCanFrameFromVirtualCanDevice();
-                                         });
+            [this](const std::error_code& ec, const std::size_t bytes_received) {
+                try
+                {
+                    if (ec)
+                    {
+                        std::string SILKitErrorMessage = "Unable to receive data from vCAN device.\n" 
+                                                "Error code: " + std::to_string(ec.value()) + " (" + ec.message() + ")\n"
+                                                "Error category: " + ec.category().name();
+                        _logger->Error(SILKitErrorMessage);
+                    }
+                    else
+                    {
+                        auto frame_data = std::vector<std::uint8_t>(bytes_received);
+                        can_frame CF;
+                        asio::buffer_copy(asio::buffer(&CF, sizeof(CF)), asio::buffer(&_canFrameBuffer, sizeof(_canFrameBuffer)), bytes_received);
+                        _onNewFrameHandler(std::move(CF));
+                    }
+                }
+                catch (const std::exception& ex)
+                {
+                    // Handle any exception that might occur
+                    std::string SILKitErrorMessage = "Exception occurred: " + std::string(ex.what());
+                    _logger->Error(SILKitErrorMessage);
+                }
+                // Continue with the next read
+                ReceiveCanFrameFromVirtualCanDevice();
+            });
     }
 
 private:
@@ -255,7 +269,7 @@ int main(int argc, char** argv)
             canConnection.SendCanFrameToCanDevice(SILKitToSocketCAN(recievedFrame));
 
             std::ostringstream SILKitDebugMessage;
-            SILKitDebugMessage << "SIL Kit >> CAN device: CAN frame (" << recievedFrame.dlc << " bytes)" << std::endl;
+            SILKitDebugMessage << "SIL Kit >> CAN device: CAN frame (" << recievedFrame.dlc << " bytes)";
             logger->Debug(SILKitDebugMessage.str());
         };
 
