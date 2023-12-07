@@ -37,7 +37,10 @@ public:
         , _onNewFrameHandler(std::move(onNewFrameHandler))
         , _logger(logger)
     {
-        _canDeviceStream.assign(GetCanDeviceFileDescriptor(canDevName.c_str()));
+        _fileDescriptor = GetCanDeviceFileDescriptor(canDevName.c_str());
+        throwInvalidFileDescriptorIf(_fileDescriptor < 0);
+
+        _canDeviceStream.assign(_fileDescriptor);
         ReceiveCanFrameFromVirtualCanDevice();
     }
 
@@ -51,46 +54,74 @@ public:
     }
 
 private:
+    
+    std::string extractErrorMessage(int errorCode)
+    {
+        const char* errorMessage = strerror(errorCode);
+
+        if (errorMessage != nullptr)
+        {
+            return ("\t(" + std::string(errorMessage) + ")");
+        }
+        else
+        {
+            return "";
+        }
+    }
+
     int GetCanDeviceFileDescriptor(const char* canDeviceName)
     {
         struct ifreq ifr;
-        int canFileDescriptor;
-        int errorCode;
 
-        if ((canFileDescriptor = socket(PF_CAN, SOCK_RAW, CAN_RAW)) < 0) // no can is open in this directory
+        int canFileDescriptor = socket(PF_CAN, SOCK_RAW, CAN_RAW);
+        if (canFileDescriptor < 0) 
         {
-            return canFileDescriptor;
+            int socketCreateErrorCode = errno; // Capture the error code
+            _logger->Error("Socket creation failed with error code: " + to_string(socketCreateErrorCode) + extractErrorMessage(socketCreateErrorCode));
+            close(canFileDescriptor);
+            return FILE_DESCRIPTOR_ERROR;
+        }
+
+        // Check if canDeviceName is null or too long, IFNAMSIZ is a constant that defines the maximum possible buffer size for an interface name (including its terminating zero byte)
+        if (canDeviceName == nullptr || strlen(canDeviceName) >= IFNAMSIZ)
+        {
+            _logger->Error("Invalid vCAN device name used for [--can-name] arg.\n" 
+                "(Hint): Ensure that the name provided is within a valid length between (1 and " + to_string(IFNAMSIZ-1) + ") characters.");
+            close(canFileDescriptor);
+            return FILE_DESCRIPTOR_ERROR;
         }
 
         memset(&ifr, 0, sizeof(ifr));
-
-        if (*canDeviceName)
-        {
-            strncpy(ifr.ifr_name, canDeviceName, IFNAMSIZ); // default is "can0"
-        }
-
-        errorCode = ioctl(canFileDescriptor, SIOCGIFINDEX, reinterpret_cast<void*>(&ifr));
-
+        strncpy(ifr.ifr_name, canDeviceName, IFNAMSIZ); 
+        
+        int errorCode = ioctl(canFileDescriptor, SIOCGIFINDEX, reinterpret_cast<void*>(&ifr));
         if (errorCode < 0)
         {
+            int ioctlError = errno;
+            _logger->Error("Failed to execute IOCTL system call with error code: " + to_string(ioctlError)+ extractErrorMessage(ioctlError)
+                           + "\n(Hint): Ensure that the network interface \"" + std::string(canDeviceName)
+                           + "\" specified in [--can-name] exists and is operational.");
             close(canFileDescriptor);
-            return errorCode;
+            return FILE_DESCRIPTOR_ERROR;
         }
-
+        
         struct sockaddr_can socketAddress;
         socketAddress.can_family = AF_CAN;
         socketAddress.can_ifindex = ifr.ifr_ifindex;
 
         // Bind socket (link socketCAN File Descriptor to address)
         /* Give the socket FD the local address ADDR (which is LEN bytes long).  */
-        if (bind(canFileDescriptor, (struct sockaddr*)&socketAddress, sizeof(socketAddress)) < 0)
+        errorCode = bind(canFileDescriptor, (struct sockaddr*)&socketAddress, sizeof(socketAddress));
+        if (errorCode < 0)
         {
-            _logger->Error("Error in socket binding");
-            return -2;
+            int bindErrorCode = errno; // Capture the error code
+            _logger->Error("Bind failed with error code: " + to_string(bindErrorCode) + extractErrorMessage(bindErrorCode));
+            close(canFileDescriptor);
+            return FILE_DESCRIPTOR_ERROR;
         }
-        
-        std::string SILKitInfoMessage = "vCAN device [" + std::string(canDeviceName) + "] successfully opened";
-        _logger->Info(SILKitInfoMessage);
+
+        _logger->Info("vCAN device [" + std::string(canDeviceName) + "] successfully opened");
+
 
         return canFileDescriptor;
     }
@@ -99,6 +130,7 @@ private:
     void ReceiveCanFrameFromVirtualCanDevice()
     {
         _canDeviceStream.async_read_some(asio::buffer(&_canFrameBuffer, sizeof(_canFrameBuffer)),
+
             [this](const std::error_code& ec, const std::size_t bytes_received) {
                 try
                 {
@@ -133,6 +165,7 @@ private:
     struct can_frame _canFrameBuffer;
     std::function<void(can_frame)> _onNewFrameHandler;
     SilKit::Services::Logging::ILogger* _logger;
+    int _fileDescriptor;
 };
 
 inline can_frame SILKitToSocketCAN(const CanFrame& silkit_can_frame)
@@ -305,8 +338,7 @@ int main(int argc, char** argv)
         auto futureStatus = runningStateFuture.wait_for(15s);
         if (futureStatus != std::future_status::ready)
         {
-            std::cout
-                << "Lifecycle Service Stopping: timed out while checking if the participant is currently running.";
+            logger->Debug("Lifecycle Service Stopping: timed out while checking if the participant is currently running.");
             promptForExit();
         }
 
@@ -315,7 +347,7 @@ int main(int argc, char** argv)
         auto finalState = finalStateFuture.wait_for(15s);
         if (finalState != std::future_status::ready)
         {
-            std::cout << "Lifecycle service stopping: timed out" << std::endl;
+             logger->Debug("Lifecycle service stopping: timed out");
             promptForExit();
         }
     }
