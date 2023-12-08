@@ -8,9 +8,10 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(CMAKE_CXX_STANDARD 17)
 
-set(SILKIT_ADAPTERS_VCAN_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/bin")
+set(SILKIT_ADAPTERS_VCAN_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin")
+set(SILKIT_ADAPTERS_VCAN_LIBRARY_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/lib")
 
-set(SILKIT_VERSION "4.0.36" CACHE STRING "If no SIL Kit package is specified, this version will be downloaded")
+set(SILKIT_VERSION "4.0.42" CACHE STRING "If no SIL Kit package is specified, this version will be downloaded")
 set(SILKIT_FLAVOR "ubuntu-18.04-x86_64-gcc" CACHE STRING "If no SIL Kit package is specified, this package flavor will be downloaded")
 
 find_package(Threads REQUIRED)
@@ -33,12 +34,11 @@ if(DEFINED SILKIT_PACKAGE_DIR)
 else()
 # otherwise, look for an installed version of SIL Kit
     message(STATUS "SILKIT_PACKAGE_DIR has not been set by user. Attempting to find an installed version of SIL Kit")
-    if(WIN32)
-        # only look for installed version of SIL Kit (.msi) if environment is Windows
-        find_package(SilKit 4.0.7
-            CONFIG
-        )
-    endif()
+    
+    find_package(SilKit 4.0.7
+        CONFIG
+    )
+    
     if(NOT SilKit_FOUND)
 		# if installed SIL Kit is not found, fetch it from github.com
 		message(STATUS "No installed version of SIL Kit was found. Attempting to fetch [SilKit-${SILKIT_VERSION}-${SILKIT_FLAVOR}] from github.com")
@@ -86,43 +86,91 @@ add_subdirectory(SocketCAN/demos)
 
 install(
     DIRECTORY            
-        ${CMAKE_CURRENT_SOURCE_DIR}/SocketCAN            
+        ${CMAKE_CURRENT_SOURCE_DIR}/SocketCAN
+        ${CMAKE_CURRENT_SOURCE_DIR}/third_party        
     DESTINATION .
     COMPONENT source
+    EXCLUDE_FROM_ALL   
     REGEX "\.git$" EXCLUDE
     REGEX "\.github$" EXCLUDE    
 )
 
 install(
-    DIRECTORY
-        ${CMAKE_CURRENT_SOURCE_DIR}/third_party
-    DESTINATION .
+    FILES            
+        ${CMAKE_CURRENT_SOURCE_DIR}/SocketCAN/demos/shell_scripts/OpenVCan_can0.sh
+        ${CMAKE_CURRENT_SOURCE_DIR}/SocketCAN/demos/shell_scripts/SendSocketCANFrames.sh
+        ${CMAKE_CURRENT_SOURCE_DIR}/SocketCAN/demos/shell_scripts/setup_vCAN_start_adapter_send_frames.sh
+    DESTINATION SocketCAN/demos/shell_scripts
+    PERMISSIONS
+        OWNER_READ OWNER_WRITE OWNER_EXECUTE
+        GROUP_READ GROUP_EXECUTE
+        WORLD_READ WORLD_EXECUTE
     COMPONENT source
-    REGEX "\.git$" EXCLUDE
-    REGEX "\.github$" EXCLUDE
+    EXCLUDE_FROM_ALL
+)
+
+install(
+    FILES            
+        ${CMAKE_CURRENT_SOURCE_DIR}/SocketCAN/demos/CANoe4SW_SE/run.sh
+        ${CMAKE_CURRENT_SOURCE_DIR}/SocketCAN/demos/CANoe4SW_SE/run_all.sh
+    DESTINATION SocketCAN/demos/CANoe4SW_SE
+    PERMISSIONS
+        OWNER_READ OWNER_WRITE OWNER_EXECUTE
+        GROUP_READ GROUP_EXECUTE
+        WORLD_READ WORLD_EXECUTE
+    COMPONENT source
+    EXCLUDE_FROM_ALL
 )
 
 install(
     FILES
         CMakeLists.txt
         CMakePresets.json
-    DESTINATION .
-    COMPONENT source
-)
-
-install(
-    FILES
         LICENSE
-        README.md        
+        README.md
+        SECURITY.md
+        CONTRIBUTING.md
     DESTINATION .
     COMPONENT source
+    EXCLUDE_FROM_ALL
+)
+
+include(GNUInstallDirs)
+
+install(
+    FILES 
+        ${SILKIT_ADAPTERS_VCAN_LIBRARY_DIRECTORY}/libSilKit.so                
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    PERMISSIONS
+        OWNER_READ OWNER_WRITE
+        GROUP_READ
+        WORLD_READ
+    COMPONENT lib
+    EXCLUDE_FROM_ALL
 )
 
 install(
-    DIRECTORY
-        ${SILKIT_ADAPTERS_VCAN_OUTPUT_DIRECTORY}
-    DESTINATION build
-    COMPONENT bin
+    TARGETS 
+        SilKitDemoCanEchoDevice
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT Runtime
+    PERMISSIONS
+        OWNER_READ OWNER_WRITE OWNER_EXECUTE
+        GROUP_READ GROUP_EXECUTE
+        WORLD_READ WORLD_EXECUTE    
+    EXCLUDE_FROM_ALL
+)
+
+# only SilKitAdapterSocketCAN should be installed to /usr/local/bin by calling --target install (therefore it is not excluded)
+install(
+    TARGETS 
+        SilKitAdapterSocketCAN        
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT Runtime
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Runtime
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}/SilKitAdapterSocketCAN COMPONENT Development   
+    PERMISSIONS
+        OWNER_READ OWNER_WRITE OWNER_EXECUTE
+        GROUP_READ GROUP_EXECUTE
+        WORLD_READ WORLD_EXECUTE
 )
 
 ###############################################################################
@@ -136,5 +184,9 @@ set(CPACK_PACKAGE_NAME "SilKit-Adapters-vCAN")
 set(CPACK_PACKAGE_VENDOR "Vector Informatik")
 set(CPACK_PACKAGE_CONTACT "support@vector.com")
 set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}${PACKAGE_FILENAME_SUFFIX}")
+
+set(CPACK_ARCHIVE_COMPONENT_INSTALL ON)
+set(CPACK_COMPONENTS_ALL_IN_ONE_PACKAGE ON)
+set(CPACK_COMPONENT_INCLUDE_TOPLEVEL_DIRECTORY ON)
 
 include(CPack)

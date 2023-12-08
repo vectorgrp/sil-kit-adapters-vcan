@@ -29,6 +29,6 @@ sleep 1
 
 <&3 $scriptDir/../shell_scripts/setup_vCAN_start_adapter_send_frames.sh &> $scriptDir/setup_vCAN_start_adapter_send_frames.out &
 
-<&3 $scriptDir/../../../build/bin/SilKitDemoCanEchoDevice &> $scriptDir/SilKitDemoCanEchoDevice.out &
+<&3 $scriptDir/../../../bin/SilKitDemoCanEchoDevice &> $scriptDir/SilKitDemoCanEchoDevice.out &
 
 $scriptDir/run.sh

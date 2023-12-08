@@ -70,7 +70,7 @@ Now is a good point to start the `sil-kit-registry`:
 
 After that, launch the SilKitAdapterSocketCAN
 
-    ./build/bin/SilKitAdapterSocketCAN --configuration ./SocketCAN/demos/SilKitConfig_Adapter.silkit.yaml
+    ./bin/SilKitAdapterSocketCAN --configuration ./SocketCAN/demos/SilKitConfig_Adapter.silkit.yaml
 
 You should see the following output in the terminal where the adapter was launched: 
 
@@ -87,7 +87,7 @@ You should see also a `SilKitAdapterSocketCAN` participant announcement in the S
 
 In a separate Terminal, launch the CanEchoDevice
 
-    ./build/bin/SilKitDemoCanEchoDevice
+    ./bin/SilKitDemoCanEchoDevice
 
 You should see the following output in the terminal after launching the CanEchoDevice:
 

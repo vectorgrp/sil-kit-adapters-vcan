@@ -39,17 +39,27 @@ The adapters and demos are built using ``cmake``:
     cmake -S. -Bbuild -DSILKIT_PACKAGE_DIR=/path/to/SilKit-x.y.z-$ubuntu/ -D CMAKE_BUILD_TYPE=Release
     cmake --build build --parallel
 
-**Note 1:** If you have installed a self-built version of SIL Kit, you can build the adapter against it by setting SILKIT_PACKAGE_DIR to the installation path, where the bin, include and lib directories are.
+**Note 1:** If you have a self-built or pre-built version of SIL Kit, you can build the adapter against it by setting SILKIT_PACKAGE_DIR to the path, where the bin, include and lib directories are.
 
-**Note 2:** If you don't provide a specific path for SILKIT_PACKAGE_DIR, a SIL Kit release package (the default version listed in CMakeLists.txt) will be fetched from github.com and the adapter will be built against it.
+**Note 2:** If you have SIL Kit installed on your system, you can build the adapter against it, even by not providing SILKIT_PACKAGE_DIR to the installation path at all.
 
-The adapter executable will be available in ``build/bin`` (depending on the configured build directory).
-Additionally the ``SilKit`` shared object (e.g., ``libSilKitd.so``) is copied to that directory automatically.
+**Note 3:** If you don't provide a specific path for SILKIT_PACKAGE_DIR and there is no SIL Kit installation on your system, a SIL Kit release package (the default version listed in CMakeLists.txt) will be fetched from github.com and the adapter will be built against it.
+
+
+The adapters and demo executables will be available in the ``bin`` directory.
+Additionally the ``SilKit`` shared library is copied to the ``lib`` directory next to it automatically.
 
 ## b) Getting Started with pre-built Adapter and Demos
 Download a preview or a release of the Adapter directly from [Vector SIL Kit Adapters Releases](https://github.com/vectorgrp/sil-kit-adapters-vcan/releases).
 
 You should also download a SIL Kit Release directly from [Vector SIL Kit Releases](https://github.com/vectorgrp/sil-kit/releases). You will need this for being able to start a sil-kit-registry.
+
+## Install the SilKitAdapterSocketCAN (optional)
+If you call the following command (can be done for self build and pre build package after cmake configure) ``SilKitAdapterSocketCAN`` can be called from everywhere without defining a path:  
+
+    sudo cmake --build build --target install
+
+The default installation path will be ``/usr/local/bin``. Be aware that SIL Kit itself also needs to be installed to make this work.
 
 ## Run the SilKitAdapterSocketCAN
 This application allows the user to attach virtual CAN interfaces (``SocketCAN``) running in Linux environment to the
@@ -71,13 +81,13 @@ Now you can run the adapter from terminal.
 
 The application *optionally* takes the following command line arguments:
 
-    ./build/bin/SilKitAdapterSocketCAN [--name <participant name{SilKitAdapterSocketCAN}>]
-                                       [--configuration <path to .silkit.yaml or .json configuration file>]
-                                       [--registry-uri silkit://<host{localhost}>:<port{8501}>]
-                                       [--log <Trace|Debug|Warn|{Info}|Error|Critical|Off>]
-                                       [--can-name <vCAN device name{can0}>]
-                                       [--network <SIL Kit CAN network{CAN1}>]
-                                       [--help]
+    ./bin/SilKitAdapterSocketCAN [--name <participant name{SilKitAdapterSocketCAN}>]
+                                 [--configuration <path to .silkit.yaml or .json configuration file>]
+                                 [--registry-uri silkit://<host{localhost}>:<port{8501}>]
+                                 [--log <Trace|Debug|Warn|{Info}|Error|Critical|Off>]
+                                 [--can-name <vCAN device name{can0}>]
+                                 [--network <SIL Kit CAN network{CAN1}>]
+                                 [--help]
 **Note:** SIL Kit-specific CLI arguments will be overwritten by the config file specified by ``--configuration``.
 
 ## SocketCAN Demo

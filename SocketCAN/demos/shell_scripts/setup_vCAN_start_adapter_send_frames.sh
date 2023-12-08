@@ -1,6 +1,6 @@
 #!/bin/bash
 
-scriptDir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
+SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 
 # cleanup trap for child processes 
 trap 'kill $(jobs -p); exit' EXIT SIGHUP;
@@ -20,19 +20,20 @@ rm $tmp_fifo
 
 # Setup can0 
 echo "Setting up [can0]..."
-<&3 $scriptDir/OpenVCan_can0.sh &> $scriptDir/OpenVCan_can0.out
+<&3 $SCRIPT_DIR/OpenVCan_can0.sh &> $SCRIPT_DIR/OpenVCan_can0.out
 
 
 # Start adapter 
-echo "Starting SKA vCAN..."
-<&3 $scriptDir/../../../build/bin/SilKitAdapterSocketCAN &> $scriptDir/SilKitAdapterSocketCAN.out &
+echo "Starting SilKitAdapterSocketCAN..."
+<&3 $SCRIPT_DIR/../../../bin/SilKitAdapterSocketCAN &> $SCRIPT_DIR/SilKitAdapterSocketCAN.out &
+sleep 1 # wait 1 second for the creation/existens of the .out file
 
-# Wait for adapter to start and connect to both [can0] and SIL Kit
-sleep 2
+timeout 30s grep -q 'Created CAN device connector for ' <(tail -f /$SCRIPT_DIR/SilKitAdapterSocketCAN.out) || exit 1
+echo "SilKitAdapterSocketCAN has been started"
 
 # Send frames on [can0] 
 echo "Sending CAN frames on [can0]..."
-<&3 $scriptDir/SendSocketCANFrames.sh &> $scriptDir/SendSocketCANFrames.out &
+<&3 $SCRIPT_DIR/SendSocketCANFrames.sh &> $SCRIPT_DIR/SendSocketCANFrames.out &
 
 # Wait for the SendSocketCANFrames process to complete (300 frames @ 2Hz -> 150 sec maximum wait)
 sleep 150

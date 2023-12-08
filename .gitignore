@@ -35,5 +35,11 @@ out/
 /out/
 /.vs/
 /build/
+/_build/
+/install/
+/_install/
+/Downloads/
+/bin/
+/lib/
 /*/build/
 /CMakeSettings.json
