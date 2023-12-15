@@ -124,7 +124,7 @@ int main(int argc, char** argv)
                                     canController->SendFrame(CanFrame{ std::move(data) }, reinterpret_cast<void*>(++transmitId));
                                     
                                     std::ostringstream SILKitDebugMessage;
-                                    SILKitDebugMessage << "Demo >> SIL Kit : CAN frame (dlc=" << (int)data.dlc << " bytes, txId=" << transmitId << ")" << std::endl;
+                                    SILKitDebugMessage << "Demo >> SIL Kit : CAN frame (dlc=" << (int)data.dlc << " bytes, txId=" << transmitId << ")";
                                     logger->Debug(SILKitDebugMessage.str());
                                 }};
 
@@ -132,7 +132,7 @@ int main(int argc, char** argv)
         {
             std::ostringstream SILKitDebugMessage;
 
-            SILKitDebugMessage << "SIL Kit >> Demo: CAN frame (" << msg.frame.dlc << " bytes)" << std::endl;
+            SILKitDebugMessage << "SIL Kit >> Demo: CAN frame (" << msg.frame.dlc << " bytes)";
             logger->Debug(SILKitDebugMessage.str());
             std::vector<uint8_t> payloadBytes(msg.frame.dataField.data(), msg.frame.dataField.data() + msg.frame.dlc); 
             demoDevice.Process(std::move(msg.frame));
@@ -143,12 +143,12 @@ int main(int argc, char** argv)
             if (ack.status == CanTransmitStatus::Transmitted)
             {
                 SILKitDebugMessage << "SIL Kit >> CAN : ACK for CAN Message with transmitId="
-                                   << reinterpret_cast<intptr_t>(ack.userContext) << std::endl;
+                                   << reinterpret_cast<intptr_t>(ack.userContext);
             }
             else
             {
                 SILKitDebugMessage << "SIL Kit >> CAN : NACK for CAN Message with transmitId="
-                                   << reinterpret_cast<intptr_t>(ack.userContext) << ": " << ack.status << std::endl;
+                                   << reinterpret_cast<intptr_t>(ack.userContext) << ": " << ack.status;
             }
             logger->Debug(SILKitDebugMessage.str());
         };
