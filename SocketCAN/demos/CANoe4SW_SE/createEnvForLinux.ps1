@@ -18,15 +18,15 @@ $canoe4sw_se_install_dir = $env:CANoe4SWSE_InstallDir64
 if ($remote) 
 {
 	# remote machine and paths configuration  
-	$remote_username="isma"
-	$remote_ip="192.168.56.102"
-	$remote_SKA_base_path="/home/isma/vfs/sil-kit-adapters-vcan"
+	$remote_username="vector"
+	$remote_ip="192.168.182.130"
+	$remote_SKA_base_path="/home/vector/SilKit/sil-kit-adapters-vcan"
 	$artifacts_subdirectory = "SocketCAN/demos/CANoe4SW_SE"
 	$remote_full_path = Join-Path -Path $remote_SKA_base_path -ChildPath $artifacts_subdirectory
 
 	#copy artifacts to VM
 	Write-Host "Copying artifacts to [${remote_username}@${remote_ip}:${remote_full_path}]..."
-	scp -r $PSScriptRoot/Default.venvironment $PSScriptRoot/TestUnit.vtestunit $PSScriptRoot/working-dir  "${remote_username}@${remote_ip}:${remote_full_path}"
+	scp -r $PSScriptRoot/Default.venvironment $PSScriptRoot/TestUnit.vtestunit "${remote_username}@${remote_ip}:${remote_full_path}"
 	Write-Host "Done."
 }
 

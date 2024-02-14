@@ -12,11 +12,28 @@
 #include <asio/ts/buffer.hpp>
 #include "silkit/util/Span.hpp"
 #include "../adapter/Parsing.hpp"
+#include "../adapter/SignalHandler.hpp"
 #include "../adapter/SilKitAdapterSocketCAN.hpp"
 
 using namespace SilKit::Services::Can;
 using namespace adapters;
 using namespace exceptions;
+
+void promptForExit()
+{
+    std::promise<int> signalPromise;
+    auto signalValue = signalPromise.get_future();
+    RegisterSignalHandler([&signalPromise](auto sigNum) {
+        signalPromise.set_value(sigNum);
+    });
+    
+    std::cout << "Press CTRL + C to stop the process..." << std::endl;
+
+    signalValue.wait();
+
+    std::cout << "\nSignal " << signalValue.get() << " received!" << std::endl;
+    std::cout << "Exiting..." << std::endl;
+}
 
 class Device
 {
@@ -53,21 +70,13 @@ public:
         }
         catch (const std::exception& error)
         {
-            std::cerr << "Something went wrong: " << error.what() << std::endl;
-            std::cout << "Press enter to stop the process..." << std::endl;
-            std::cin.ignore();
+            std::cerr << "Something went wrong: " << error.what() << std::endl;            
         }
     }
     
 private: 
     std::function<void(CanFrame)> _sendFrameCallback;
 };
-
-void promptForExit()
-{
-    std::cout << "Press enter to stop the process..." << std::endl;
-    std::cin.ignore();
-}
 
 void print_demo_help(bool userRequested)
 {
@@ -161,24 +170,18 @@ int main(int argc, char** argv)
     }
     catch (const SilKit::ConfigurationError& error)
     {
-        std::cerr << "Invalid configuration: " << error.what() << std::endl;
-        std::cout << "Press enter to stop the process..." << std::endl;
-        std::cin.ignore();
+        std::cerr << "Invalid configuration: " << error.what() << std::endl;        
         return CONFIGURATION_ERROR;
     }
     catch (const InvalidCli&)
     {
         print_demo_help(false);
-        std::cerr << std::endl << "Invalid command line arguments." << std::endl;
-        std::cout << "Press enter to stop the process..." << std::endl;
-        std::cin.ignore();
+        std::cerr << std::endl << "Invalid command line arguments." << std::endl;        
         return CLI_ERROR;
     }
     catch (const std::exception& error)
     {
-        std::cerr << "Something went wrong: " << error.what() << std::endl;
-        std::cout << "Press enter to stop the process..." << std::endl;
-        std::cin.ignore();
+        std::cerr << "Something went wrong: " << error.what() << std::endl;        
         return OTHER_ERROR;
     }
     return NO_ERROR;

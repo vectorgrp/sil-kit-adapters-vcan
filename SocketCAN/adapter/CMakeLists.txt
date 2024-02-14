@@ -1,6 +1,7 @@
 add_executable(SilKitAdapterSocketCAN
     "SilKitAdapterSocketCAN.cpp"
-    "Parsing.cpp")
+    "Parsing.cpp"
+    "SignalHandler.cpp")
 target_link_libraries(SilKitAdapterSocketCAN
     PRIVATE
     Utility

@@ -11,7 +11,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(SILKIT_ADAPTERS_VCAN_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin")
 set(SILKIT_ADAPTERS_VCAN_LIBRARY_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/lib")
 
-set(SILKIT_VERSION "4.0.42" CACHE STRING "If no SIL Kit package is specified, this version will be downloaded")
+set(SILKIT_VERSION "4.0.43" CACHE STRING "If no SIL Kit package is specified, this version will be downloaded")
 set(SILKIT_FLAVOR "ubuntu-18.04-x86_64-gcc" CACHE STRING "If no SIL Kit package is specified, this package flavor will be downloaded")
 
 find_package(Threads REQUIRED)
@@ -45,8 +45,7 @@ else()
         FetchContent_Declare(
                 silkit
                 URL https://github.com/vectorgrp/sil-kit/releases/download/sil-kit%2Fv${SILKIT_VERSION}/SilKit-${SILKIT_VERSION}-${SILKIT_FLAVOR}.zip
-                DOWNLOAD_DIR ${CMAKE_CURRENT_LIST_DIR}/Downloads
-                DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+                DOWNLOAD_DIR ${CMAKE_CURRENT_LIST_DIR}/Downloads                
             )
 
         message(STATUS "SIL Kit: fetching [SilKit-${SILKIT_VERSION}-${SILKIT_FLAVOR}]")

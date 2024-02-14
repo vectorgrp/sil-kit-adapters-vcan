@@ -79,7 +79,7 @@ You should see the following output in the terminal where the adapter was launch
     [date time] [SilKitAdapterSocketCAN] [info] Creating CAN controller 'SilKitAdapterSocketCAN_CAN_CTRL'
     [date time] [SilKitAdapterSocketCAN] [info] Creating CAN device connector for 'can0'
     [date time] [SilKitAdapterSocketCAN] [info] vCAN device successfully opened
-    Press enter to stop the process...
+    Press CTRL + C to stop the process...
 
 You should see also a `SilKitAdapterSocketCAN` participant announcement in the SIL Kit registry terminal
 
@@ -95,7 +95,7 @@ You should see the following output in the terminal after launching the CanEchoD
     [date time] [CanEchoDevice] [info] Creating participant 'CanEchoDevice' at 'silkit://localhost:8501', SIL Kit version: 4.0.36
     [date time] [CanEchoDevice] [info] Connected to registry at 'tcp://127.0.0.1:8501' via 'tcp://127.0.0.1:35464' (silkit://localhost:8501)
     [date time] [CanEchoDevice] [info] Creating CAN controller 'CanEchoDevice_CAN1'
-    Press enter to stop the process...
+    Press CTRL + C to stop the process...
 
 **Note:** You can launch `SilKitDemoCanEchoDevice` with `--log Debug` argument if you want to see the CAN payload traffic logs. 
 
@@ -137,7 +137,7 @@ The test cases are executed automatically and you should see a short test report
 
 #### CANoe4SW Server Edition (Linux)
 You can also run the same test set with `CANoe4SW SE (Linux)`. At first you have to execute the powershell script `demos/CANoe4SW_SE/createEnvForLinux.ps1` on your windows system by using tools of `CANoe4SW SE (Windows)` to prepare your test environment for Linux. 
-In `demos/CANoe4SW_SE/run.sh` you should adapt `canoe4sw_se_install_dir` to the path of your `CANoe4SW SE` installation in your WSL2. Afterwards you can execute `demos/CANoe4SW_SE/run.sh` in your WSL2. The test cases are executed automatically and you should see a short test report in your terminal after execution.
+In `demos/CANoe4SW_SE/run.sh` you should adapt `canoe4sw_se_install_dir` to the path of your `CANoe4SW SE` installation in your Linux system. Afterwards you can execute `demos/CANoe4SW_SE/run.sh` in your Linux system. The test cases are executed automatically and you should see a short test report in your terminal after execution.
 
 
 ### Generating CAN data in CANoe Desktop Edition 

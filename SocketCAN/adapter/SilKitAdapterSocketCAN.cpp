@@ -19,6 +19,7 @@
 
 #include "Exceptions.hpp"
 #include "Parsing.hpp"
+#include "SignalHandler.hpp"
 
 #include "SilKitAdapterSocketCAN.hpp"
 
@@ -195,8 +196,18 @@ inline CanFrame SocketCANToSILKit(const struct can_frame& socketcan_frame)
 
 void promptForExit()
 {
-    std::cout << "Press enter to stop the process..." << std::endl;
-    std::cin.ignore();
+    std::promise<int> signalPromise;
+    auto signalValue = signalPromise.get_future();
+    RegisterSignalHandler([&signalPromise](auto sigNum) {
+        signalPromise.set_value(sigNum);
+    });
+    
+    std::cout << "Press CTRL + C to stop the process..." << std::endl;
+
+    signalValue.wait();
+
+    std::cout << "\nSignal " << signalValue.get() << " received!" << std::endl;
+    std::cout << "Exiting..." << std::endl;
 }
 
 int main(int argc, char** argv)
@@ -338,8 +349,7 @@ int main(int argc, char** argv)
         auto futureStatus = runningStateFuture.wait_for(15s);
         if (futureStatus != std::future_status::ready)
         {
-            logger->Debug("Lifecycle Service Stopping: timed out while checking if the participant is currently running.");
-            promptForExit();
+            logger->Debug("Lifecycle Service Stopping: timed out while checking if the participant is currently running.");            
         }
 
         lifecycleService->Stop("Adapter stopped by the user.");
@@ -347,27 +357,23 @@ int main(int argc, char** argv)
         auto finalState = finalStateFuture.wait_for(15s);
         if (finalState != std::future_status::ready)
         {
-             logger->Debug("Lifecycle service stopping: timed out");
-            promptForExit();
+             logger->Debug("Lifecycle service stopping: timed out");            
         }
     }
     catch (const SilKit::ConfigurationError& error)
     {
-        std::cerr << "Invalid configuration: " << error.what() << std::endl;
-        promptForExit();
+        std::cerr << "Invalid configuration: " << error.what() << std::endl;        
         return CONFIGURATION_ERROR;
     }
     catch (const InvalidCli&)
     {
         adapters::print_help();
-        std::cerr << std::endl << "Invalid command line arguments." << std::endl;
-        promptForExit();
+        std::cerr << std::endl << "Invalid command line arguments." << std::endl;        
         return CLI_ERROR;
     }
     catch (const std::exception& error)
     {
-        std::cerr << "Something went wrong: " << error.what() << std::endl;
-        promptForExit();
+        std::cerr << "Something went wrong: " << error.what() << std::endl;        
         return OTHER_ERROR;
     }
 
