@@ -21,7 +21,7 @@ echo "Starting SilKitAdapterSocketCAN..."
 $SCRIPT_DIR/../../../bin/SilKitAdapterSocketCAN &> $SCRIPT_DIR/SilKitAdapterSocketCAN.out &
 sleep 1 # wait 1 second for the creation/existens of the .out file
 
-timeout 30s grep -q 'Press CTRL + C to stop the process...' <(tail -f /$SCRIPT_DIR/SilKitAdapterSocketCAN.out) || exit 1
+timeout 30s grep -q 'Press CTRL + C to stop the process...' <(tail -f /$SCRIPT_DIR/SilKitAdapterSocketCAN.out) || (echo "[error] Timeout reached while waiting for sil-kit-registry to start"; exit 1;)
 echo "SilKitAdapterSocketCAN has been started"
 
 # Send frames on [can0] 

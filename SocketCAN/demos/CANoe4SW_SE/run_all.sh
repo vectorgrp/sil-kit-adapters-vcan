@@ -17,9 +17,9 @@ if [[ $EUID -ne 0 ]]; then
 fi
 
 $silKitDir/SilKit/bin/sil-kit-registry --listen-uri 'silkit://0.0.0.0:8501' -s &> $scriptDir/sil-kit-registry.out &
-
 # give sil-kit-registry time for startup
 sleep 1
+timeout 30s grep -q 'Registered signal handler' <(tail -f /$scriptDir/sil-kit-registry.out) || (echo "[error] Timeout reached while waiting for sil-kit-registry to start"; exit 1;)
 
 $scriptDir/../shell_scripts/setup_vCAN_start_adapter_send_frames.sh &> $scriptDir/setup_vCAN_start_adapter_send_frames.out &
 
