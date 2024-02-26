@@ -1,7 +1,13 @@
 #!/bin/bash
 
+# check if user is root
+if [[ $EUID -ne 0 ]]; then
+    echo "This script must be run as root / via sudo!"
+    exit 1
+fi
+
 echo "Loading vCAN kernel module"
-sudo modprobe vcan
+modprobe vcan
 
 # Check if [can0] interface is already up: <NOARP,UP,LOWER_UP> flags should be set.
 #"NOARP": the interface does not use ARP (Address Resolution Protocol) to map IP addresses to hardware addresses
@@ -17,11 +23,11 @@ fi
 
 # Create a new vcan interface 
 echo "Creating [can0] interface."
-sudo ip link add dev can0 type vcan
-sudo ip link set up can0
+ip link add dev can0 type vcan
+ip link set up can0
 
 # Make sure all is OK
-if sudo ip link show can0 | grep -q "<NOARP,UP,LOWER_UP>"; then
+if ip link show can0 | grep -q "<NOARP,UP,LOWER_UP>"; then
         echo "vCAN interface [can0] is up & running."
 else
         echo "Something is wrong with vCAN interface [can0]"
