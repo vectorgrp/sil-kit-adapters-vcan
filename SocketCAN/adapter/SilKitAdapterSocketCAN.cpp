@@ -95,7 +95,7 @@ private:
         memset(&ifr, 0, sizeof(ifr));
         strncpy(ifr.ifr_name, canDeviceName, IFNAMSIZ); 
         
-        int errorCode = ioctl(canFileDescriptor, SIOCGIFINDEX, reinterpret_cast<void*>(&ifr));
+        int errorCode = ioctl(canFileDescriptor, SIOCGIFINDEX, &ifr);
         if (errorCode < 0)
         {
             int ioctlError = errno;
