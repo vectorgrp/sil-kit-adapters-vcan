@@ -148,44 +148,8 @@ can0  002   [4]  AA BB BB 00
 As described earlier, CAN messages with ID of 001 are the ones sent from the QEMU image. On the other hand, the ones with ID 002 have been sent back from the CanEchoDevice after increasing ID by `1` and applying a shift-left of data by one byte.  
 
 ### Adding CANoe (16 SP3 or newer) as a participant
-If CANoe is connected to the SIL Kit, all CAN traffic is visible there as well. You can also execute a test unit which checks if the CAN messages are being transmitted as expected.
-
-Before you can connect CANoe to the SIL Kit network you should adapt the `RegistryUri` in `./SocketCAN/demos/CANoe_SILKit_config.silkit.yaml` to the IP address of your system where your sil-kit-registry is running. 
-The configuration file is referenced by both following CANoe use cases (Desktop Edition and Server Edition).
-
-### CANoe Desktop Edition
-Load the `CANoe_vCAN_configuration.cfg` from the `./SocketCAN/demos/CANoe` directory and start the measurement. Optionally you can also start the test unit execution of included test configuration.
-While the demo is running these tests should be successful.
-
-### CANoe4SW Server Edition (Windows)
-You can also run the same test set with `CANoe4SW SE` by executing the following powershell script `./SocketCAN/demos/CANoe4SW_SE/run.ps1`. 
-The test cases are executed automatically and you should see a short test report in powershell after execution.
-
-### CANoe4SW Server Edition (Linux)
-You can also run the same test set with `CANoe4SW SE (Linux)`. At first you have to execute the powershell script `./SocketCAN/demos/CANoe4SW_SE/createEnvForLinux.ps1` on your windows system by using tools of `CANoe4SW SE (Windows)` to prepare your test environment for Linux. 
-In `./SocketCAN/demos/CANoe4SW_SE/run.sh` you should adapt `canoe4sw_se_install_dir` to the path of your `CANoe4SW SE` installation in your Linux system. Afterwards you can execute `./SocketCAN/demos/CANoe4SW_SE/run.sh` in your Linux system. The test cases are executed automatically and you should see a short test report in your terminal after execution.
+It is possible to integrate CANoe (16 SP3 or newer) in the previously-elaborated setup and add it as a SIL Kit participant. The steps to do this are shown here [SocketCAN/README.md](../SocketCAN/README.md#adding-canoe-16-sp3-or-newer-as-a-participant). 
 
 ## Generating CAN data in CANoe Desktop Edition 
-This is done with the same previous setup, but instead of generating CAN traffic inside the QEMU image, CANoe Desktop Edition is the source of CAN payload.  
-
-You can start generating CAN frames in CANoe Desktop Edition using the CanDemoPanel: 
-
-![CanDemoPanel](../SocketCAN/demos/images/CanDemoPanel_screenshot.png)
-
-After starting the measurement, click on the `Toggle sending` button to start sending CAN frames on SIL Kit CAN1 network. The outgoing CAN frames have an ID of `0C8` and hold `87 65 43 21` data.
-
-You can read data that is available on the `can0` vCAN device inside the QEMU image by using:
-```
-candump can0
-```
-If the CanEchoDevice is running along with the SilKitAdapterSocketCAN, you should see output similar to the following in the terminal:
-``` 
-can0  0C8   [4]  87 65 43 21
-can0  0C9   [4]  65 43 21 00
-can0  0C8   [4]  87 65 43 21
-can0  0C9   [4]  65 43 21 00
-. 
-.
-```
-As described earlier, CAN messages with ID of 0C8 are the ones sent from CANoe Desktop Edition and the ones with ID 0C9 are the response of the CanEchoDevice to those frames, after increasing their ID by `1` and applying a shift-left of data by one byte. 
+It is possible to generate CAN traffic from CANoe and to observe the reception of these frames on the CAN device inside the QEMU image. The steps to do this are shown here [SocketCAN/README.md](../SocketCAN/README.md#generating-can-data-in-canoe-desktop-edition)
 

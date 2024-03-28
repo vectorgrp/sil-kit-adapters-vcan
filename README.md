@@ -95,3 +95,8 @@ The aim of this demo is to showcase a simple adapter that forwards CAN traffic f
 Vector SIL Kit. 
 
 This demo is further explained in [SocketCAN/README.md](SocketCAN/README.md).
+
+## QEMU Demo
+This demo is a step-by-step guide on how to use the adapter to link a QEMU image with an exposed SocketCAN interface to a SIL Kit CAN network, as well as some instructions to setup the QEMU image with an exposed SocketCAN interface.  
+
+This demo is further explained in [QEMU/README.md](QEMU/README.md).
