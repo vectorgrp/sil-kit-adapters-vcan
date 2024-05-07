@@ -231,7 +231,15 @@ inline canfd_frame SILKitToSocketCAN(const CanFrame& silkit_can_frame)
     socketcan_frame.len = dlcToLen(silkit_can_frame.dlc);
     memset(&socketcan_frame.__res0, 0, sizeof(socketcan_frame.__res0)); // set reserved fields to zero
     memset(&socketcan_frame.__res1, 0, sizeof(socketcan_frame.__res1));
-    //socketcan_frame.len8_dlc = silkit_can_frame.dlc; // optional DLC for 8 byte payload length (9 .. 15)
+    // Copy flags
+    socketcan_frame.flags = 0;
+    if(silkit_can_frame.flags & static_cast<CanFrameFlagMask>(CanFrameFlag::Fdf)){
+        socketcan_frame.flags |= CANFD_FDF;
+    }
+    if(silkit_can_frame.flags & static_cast<CanFrameFlagMask>(CanFrameFlag::Brs)){
+        socketcan_frame.flags |= CANFD_BRS;
+    }
+    
     memcpy(socketcan_frame.data, silkit_can_frame.dataField.data(), silkit_can_frame.dataField.size());
     return socketcan_frame;
 }
@@ -244,10 +252,10 @@ inline CanFrame SocketCANToSILKit(const struct canfd_frame& socketcan_frame)
     silkit_frame.dlc = lenToDlc(socketcan_frame.len);
 
     if(socketcan_frame.flags & CANFD_FDF){
-        silkit_frame.flags = static_cast<CanFrameFlagMask>(silkit_frame.flags | static_cast<CanFrameFlagMask>(CanFrameFlag::Fdf));
+        silkit_frame.flags |= static_cast<CanFrameFlagMask>(CanFrameFlag::Fdf);
     }
     if(socketcan_frame.flags & CANFD_BRS){
-        silkit_frame.flags = static_cast<CanFrameFlagMask>(silkit_frame.flags | static_cast<CanFrameFlagMask>(CanFrameFlag::Brs));
+        silkit_frame.flags |= static_cast<CanFrameFlagMask>(CanFrameFlag::Brs);
     }
 
     silkit_frame.sdt = 0; // not used in SocketCAN
