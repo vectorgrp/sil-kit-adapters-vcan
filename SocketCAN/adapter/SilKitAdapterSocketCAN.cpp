@@ -33,7 +33,7 @@ class CanConnection
 {
 public:
     CanConnection(asio::io_context& io_context, const std::string& canDevName,
-                  std::function<void(can_frame)> onNewFrameHandler, SilKit::Services::Logging::ILogger* logger)
+                  std::function<void(canfd_frame)> onNewFrameHandler, SilKit::Services::Logging::ILogger* logger)
         : _canDeviceStream{io_context}
         , _onNewFrameHandler(std::move(onNewFrameHandler))
         , _logger(logger)
@@ -45,7 +45,7 @@ public:
         ReceiveCanFrameFromVirtualCanDevice();
     }
 
-    void SendCanFrameToCanDevice(const can_frame& frame)
+    void SendCanFrameToCanDevice(const canfd_frame& frame)
     {
         auto sizeSent = _canDeviceStream.write_some(asio::buffer(&frame, sizeof(frame)));
         if (sizeof(frame) != sizeSent)
@@ -110,6 +110,23 @@ private:
         socketAddress.can_family = AF_CAN;
         socketAddress.can_ifindex = ifr.ifr_ifindex;
 
+        // Enable CAN-FD
+        int fd_enabled = 1;
+        errorCode = setsockopt(
+            canFileDescriptor,
+            SOL_CAN_RAW,
+            CAN_RAW_FD_FRAMES,
+            &fd_enabled,
+            sizeof(fd_enabled)
+        );
+        if (errorCode < 0)
+        {
+            int bindErrorCode = errno; // Capture the error code
+            _logger->Error("Bind failed with error code: " + to_string(bindErrorCode) + extractErrorMessage(bindErrorCode));
+            close(canFileDescriptor);
+            return FILE_DESCRIPTOR_ERROR;
+        }
+
         // Bind socket (link socketCAN File Descriptor to address)
         /* Give the socket FD the local address ADDR (which is LEN bytes long).  */
         errorCode = bind(canFileDescriptor, (struct sockaddr*)&socketAddress, sizeof(socketAddress));
@@ -145,7 +162,7 @@ private:
                     else
                     {
                         auto frame_data = std::vector<std::uint8_t>(bytes_received);
-                        can_frame CF;
+                        canfd_frame CF;
                         asio::buffer_copy(asio::buffer(&CF, sizeof(CF)), asio::buffer(&_canFrameBuffer, sizeof(_canFrameBuffer)), bytes_received);
                         _onNewFrameHandler(std::move(CF));
                     }
@@ -163,34 +180,80 @@ private:
 
 private:
     asio::posix::basic_stream_descriptor<> _canDeviceStream;
-    struct can_frame _canFrameBuffer;
-    std::function<void(can_frame)> _onNewFrameHandler;
+    struct canfd_frame _canFrameBuffer;
+    std::function<void(canfd_frame)> _onNewFrameHandler;
     SilKit::Services::Logging::ILogger* _logger;
     int _fileDescriptor;
 };
 
-inline can_frame SILKitToSocketCAN(const CanFrame& silkit_can_frame)
+inline unsigned char dlcToLen(uint16_t dlc)
 {
-    struct can_frame socketcan_frame;
+    if (dlc <= CAN_MAX_DLEN)
+    {
+        return dlc;
+    }
+    switch (dlc)
+    {
+    case 9: return 12;
+    case 10: return 16;
+    case 11: return 20;
+    case 12: return 24;
+    case 13: return 32;
+    case 14: return 48;
+    case 15: return 64;
+    default: return 0;
+    }
+}
+
+inline uint16_t lenToDlc(unsigned char len)
+{
+    if (len <= CAN_MAX_DLEN)
+    {
+        return len;
+    }
+    switch (len)
+    {
+    case 12: return 9;
+    case 16: return 10;
+    case 20: return 11;
+    case 24: return 12;
+    case 32: return 13;
+    case 48: return 14;
+    case 64: return 15;
+    default: return 0;
+    }
+}
+
+inline canfd_frame SILKitToSocketCAN(const CanFrame& silkit_can_frame)
+{
+    struct canfd_frame socketcan_frame;
     socketcan_frame.can_id = silkit_can_frame.canId;
-    socketcan_frame.can_dlc = silkit_can_frame.dlc;
-    memset(&socketcan_frame.__pad, 0, sizeof(socketcan_frame.__pad)); // set padding to zero
-    memset(&socketcan_frame.__res0, 0, sizeof(socketcan_frame.__res0)); // set reserved field to zero
+    socketcan_frame.len = dlcToLen(silkit_can_frame.dlc);
+    memset(&socketcan_frame.__res0, 0, sizeof(socketcan_frame.__res0)); // set reserved fields to zero
+    memset(&socketcan_frame.__res1, 0, sizeof(socketcan_frame.__res1));
     //socketcan_frame.len8_dlc = silkit_can_frame.dlc; // optional DLC for 8 byte payload length (9 .. 15)
     memcpy(socketcan_frame.data, silkit_can_frame.dataField.data(), silkit_can_frame.dataField.size());
     return socketcan_frame;
 }
 
-inline CanFrame SocketCANToSILKit(const struct can_frame& socketcan_frame)
+inline CanFrame SocketCANToSILKit(const struct canfd_frame& socketcan_frame)
 {
     CanFrame silkit_frame;
     silkit_frame.canId = socketcan_frame.can_id;
     silkit_frame.flags = static_cast<CanFrameFlagMask>(socketcan_frame.can_id & CAN_EFF_FLAG); // get EFF/RTR/ERR flags
-    silkit_frame.dlc = socketcan_frame.can_dlc;
+    silkit_frame.dlc = lenToDlc(socketcan_frame.len);
+
+    if(socketcan_frame.flags & CANFD_FDF){
+        silkit_frame.flags = static_cast<CanFrameFlagMask>(silkit_frame.flags | static_cast<CanFrameFlagMask>(CanFrameFlag::Fdf));
+    }
+    if(socketcan_frame.flags & CANFD_BRS){
+        silkit_frame.flags = static_cast<CanFrameFlagMask>(silkit_frame.flags | static_cast<CanFrameFlagMask>(CanFrameFlag::Brs));
+    }
+
     silkit_frame.sdt = 0; // not used in SocketCAN
     silkit_frame.vcid = 0; // not used in SocketCAN
     silkit_frame.af = 0; // not used in SocketCAN
-    silkit_frame.dataField = SilKit::Util::Span<const uint8_t>(socketcan_frame.data, socketcan_frame.can_dlc);
+    silkit_frame.dataField = SilKit::Util::Span<const uint8_t>(socketcan_frame.data, socketcan_frame.len);
     return silkit_frame;
 }
 
@@ -290,13 +353,13 @@ int main(int argc, char** argv)
         logger->Info(SILKitInfoMessage.str());
         auto* canController = participant->CreateCanController(canControllerName, canNetworkName);
 
-        const auto onReceiveCanFrameFromCanDevice = [&logger, canController](can_frame data) {
+        const auto onReceiveCanFrameFromCanDevice = [&logger, canController](canfd_frame data) {
             static intptr_t transmitId = 0;
             canController->SendFrame(SocketCANToSILKit(data), reinterpret_cast<void*>(transmitId++));
 
             std::ostringstream SILKitDebugMessage;
 
-            SILKitDebugMessage << "CAN device >> SIL Kit: CAN frame (dlc=" <<  static_cast<int>(data.can_dlc) << ", CAN ID=0x"
+            SILKitDebugMessage << "CAN device >> SIL Kit: CAN frame (len=" <<  static_cast<int>(data.len) << ", CAN ID=0x"
                                << std::hex << static_cast<int>(data.can_id) << std::dec << ", txId=" << transmitId << ")";
             logger->Debug(SILKitDebugMessage.str());
         };
