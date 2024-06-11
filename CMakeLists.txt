@@ -22,7 +22,7 @@ target_link_libraries(asio INTERFACE Threads::Threads)
 
 if(DEFINED SILKIT_PACKAGE_DIR)    
 # if the user forces using a specific SIL Kit package, use it
-	message(STATUS "SILKIT_PACKAGE_DIR has been set to: ${SILKIT_PACKAGE_DIR}, CMAKE will look for a SIL Kit package in that directory")
+    message(STATUS "SILKIT_PACKAGE_DIR has been set to: ${SILKIT_PACKAGE_DIR}, CMAKE will look for a SIL Kit package in that directory")
     find_package(SilKit 4.0.40
         REQUIRED
         CONFIG
@@ -40,13 +40,13 @@ else()
     )
     
     if(NOT SilKit_FOUND)
-		# if installed SIL Kit is not found, fetch it from github.com
-		message(STATUS "No installed version of SIL Kit was found. Attempting to fetch [SilKit-${SILKIT_VERSION}-${SILKIT_FLAVOR}] from github.com")
+        # if installed SIL Kit is not found, fetch it from github.com
+        message(STATUS "No installed version of SIL Kit was found. Attempting to fetch [SilKit-${SILKIT_VERSION}-${SILKIT_FLAVOR}] from github.com")
         FetchContent_Declare(
-                silkit
-                URL https://github.com/vectorgrp/sil-kit/releases/download/sil-kit%2Fv${SILKIT_VERSION}/SilKit-${SILKIT_VERSION}-${SILKIT_FLAVOR}.zip
-                DOWNLOAD_DIR ${CMAKE_CURRENT_LIST_DIR}/Downloads                
-            )
+            silkit
+            URL https://github.com/vectorgrp/sil-kit/releases/download/sil-kit%2Fv${SILKIT_VERSION}/SilKit-${SILKIT_VERSION}-${SILKIT_FLAVOR}.zip
+            DOWNLOAD_DIR ${CMAKE_CURRENT_LIST_DIR}/Downloads                
+        )
 
         message(STATUS "SIL Kit: fetching [SilKit-${SILKIT_VERSION}-${SILKIT_FLAVOR}]")
         FetchContent_MakeAvailable(silkit)
@@ -67,12 +67,11 @@ else()
 endif()
 
 if(TARGET SilKit::SilKit)
-	message(STATUS "SIL Kit package has been successfully imported as a CMake target. [version : ${SilKit_VERSION}]")
+    message(STATUS "SIL Kit package has been successfully imported as a CMake target. [version : ${SilKit_VERSION}]")
 else()
-	message(FATAL_ERROR "Something went wrong : Could not find SIL Kit package.")
+    message(FATAL_ERROR "Something went wrong : Could not find SIL Kit package.")
 endif()
 
-add_subdirectory(SocketCAN/Utility)
 add_subdirectory(SocketCAN/adapter)
 add_subdirectory(SocketCAN/demos)
 

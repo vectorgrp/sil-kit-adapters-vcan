@@ -11,9 +11,9 @@
 #include "silkit/services/can/string_utils.hpp"
 #include <asio/ts/buffer.hpp>
 #include "silkit/util/Span.hpp"
-#include "../adapter/Parsing.hpp"
-#include "../adapter/SignalHandler.hpp"
-#include "../adapter/SilKitAdapterSocketCAN.hpp"
+#include "adapter/Parsing.hpp"
+#include "adapter/SignalHandler.hpp"
+#include "adapter/SilKitAdapterSocketCAN.hpp"
 
 using namespace SilKit::Services::Can;
 using namespace adapters;

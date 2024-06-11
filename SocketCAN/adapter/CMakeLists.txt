@@ -1,16 +1,20 @@
 add_executable(SilKitAdapterSocketCAN
     "SilKitAdapterSocketCAN.cpp"
     "Parsing.cpp"
-    "SignalHandler.cpp")
+    "SignalHandler.cpp"
+)
+target_include_directories(SilKitAdapterSocketCAN 
+    PRIVATE
+    "${CMAKE_SOURCE_DIR}/SocketCAN/Utility/"
+)
 target_link_libraries(SilKitAdapterSocketCAN
     PRIVATE
-    Utility
-	asio
-	SilKit::SilKit
+    asio
+    SilKit::SilKit
 )
 set_target_properties(SilKitAdapterSocketCAN 
-	PROPERTIES
-	#ensure SilKit shared libraries can be loaded
+    PROPERTIES
+    #ensure SilKit shared libraries can be loaded
     INSTALL_RPATH "$ORIGIN/../lib:$ORIGIN"
     BUILD_RPATH "$ORIGIN"
     RUNTIME_OUTPUT_DIRECTORY $<$<BOOL:ALWAYS>:${SILKIT_ADAPTERS_VCAN_OUTPUT_DIRECTORY}>

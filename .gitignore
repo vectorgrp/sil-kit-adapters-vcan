@@ -34,6 +34,7 @@
 out/
 /out/
 /.vs/
+/.vscode/
 /build/
 /_build/
 /install/
