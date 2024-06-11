@@ -181,17 +181,40 @@ inline can_frame SILKitToSocketCAN(const CanFrame& silkit_can_frame)
     return socketcan_frame;
 }
 
-inline CanFrame SocketCANToSILKit(const struct can_frame& socketcan_frame)
+inline bool SocketCANToSILKit(const struct can_frame& socketcan_frame, CanFrame & silkit_frame)
 {
-    CanFrame silkit_frame;
-    silkit_frame.canId = socketcan_frame.can_id;
-    silkit_frame.flags = static_cast<CanFrameFlagMask>(socketcan_frame.can_id & CAN_EFF_FLAG); // get EFF/RTR/ERR flags
+    silkit_frame = CanFrame{};
+
+    if (socketcan_frame.can_id & CAN_EFF_FLAG)
+    {
+        // extended frame format / identifier extension (29 bit CAN ID)
+        silkit_frame.canId = socketcan_frame.can_id & CAN_EFF_MASK;
+        silkit_frame.flags |= static_cast<CanFrameFlagMask>(CanFrameFlag::Ide);
+    }
+    else
+    {
+        // standard frame format / no identifier extension (11 bit CAN ID)
+        silkit_frame.canId = socketcan_frame.can_id & CAN_SFF_MASK;
+    }
+
+    if (socketcan_frame.can_id & CAN_RTR_FLAG)
+    {
+        silkit_frame.flags |= static_cast<CanFrameFlagMask>(CanFrameFlag::Rtr);
+    }
+
+    if (socketcan_frame.can_id & CAN_ERR_FLAG)
+    {
+        // SIL Kit does not support error frames
+        return false;
+    }
+
     silkit_frame.dlc = socketcan_frame.can_dlc;
     silkit_frame.sdt = 0; // not used in SocketCAN
     silkit_frame.vcid = 0; // not used in SocketCAN
     silkit_frame.af = 0; // not used in SocketCAN
     silkit_frame.dataField = SilKit::Util::Span<const uint8_t>(socketcan_frame.data, socketcan_frame.can_dlc);
-    return silkit_frame;
+
+    return true;
 }
 
 void promptForExit()
@@ -291,8 +314,15 @@ int main(int argc, char** argv)
         auto* canController = participant->CreateCanController(canControllerName, canNetworkName);
 
         const auto onReceiveCanFrameFromCanDevice = [&logger, canController](can_frame data) {
+            CanFrame canFrame;
+            if (!SocketCANToSILKit(data, canFrame))
+            {
+                logger->Error("Failed to convert SocketCAN frame to SIL Kit CAN frame");
+                return;
+            }
+
             static intptr_t transmitId = 0;
-            canController->SendFrame(SocketCANToSILKit(data), reinterpret_cast<void*>(transmitId++));
+            canController->SendFrame(canFrame, reinterpret_cast<void*>(transmitId++));
 
             std::ostringstream SILKitDebugMessage;
 
