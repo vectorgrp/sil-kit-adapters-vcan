@@ -1,6 +1,6 @@
 #!/bin/bash
 scriptDir=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-silKitDir=/home/vector/SilKit/SilKit-4.0.43-ubuntu-18.04-x86_64-gcc/
+silKitDir=/home/vector/vfs/SILKit/SilKit-4.0.50-ubuntu-18.04-x86_64-gcc/
 # if "exported_full_path_to_silkit" environment variable is set (in pipeline script), use it. Otherwise, use default value
 silKitDir="${exported_full_path_to_silkit:-$silKitDir}"
 
@@ -35,8 +35,8 @@ echo "sil-kit-registry.out:-----------------------------------------------------
 cat $scriptDir/sil-kit-registry.out
 echo "-----------------------------------------------------------------------------------------------------------" 
 
-echo "setup_vCAN_start_adapter_send_frames.out:---------------------------------------------------------------------------" 
-cat $scriptDir/setup_vCAN_start_adapter_send_frames.out
+echo "setup_vCAN_start_adapter_send_CAN_frames.out:--------------------------------------------------------------" 
+cat $scriptDir/setup_vCAN_start_adapter_send_CAN_frames.out
 echo "-----------------------------------------------------------------------------------------------------------" 
 
 #exit run_all.sh with same exit_status

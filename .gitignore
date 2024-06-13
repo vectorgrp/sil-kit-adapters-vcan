@@ -44,6 +44,7 @@ out/
 /lib/
 /*/build/
 /SocketCAN/demos/CANoe4SW_SE/Default.venvironment/
-/SocketCAN/demos/CANoe4SW_SE/TestUnit.vtestunit/
+/SocketCAN/demos/CANoe4SW_SE/test_CAN_EchoDevice.vtestunit/
 /SocketCAN/demos/CANoe4SW_SE/working-dir/
 /CMakeSettings.json
+/SocketCAN/demos/CANoe/.run

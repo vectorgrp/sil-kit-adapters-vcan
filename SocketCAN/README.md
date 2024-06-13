@@ -121,7 +121,7 @@ If both the `SendSocketCANFrames.sh` script and the CanEchoDevice are running al
 As described earlier, CAN messages with ID of 001 are the ones sent from can0 (outgoing). On the other hand, the ones with ID 002 are being received on `can0`, these have been sent back from the CanEchoDevice after increasing ID by `1` and applying a shift-left of data by one byte. 
 
 
-#### Adding CANoe (16 SP3 or newer) as a participant
+#### Adding CANoe (17 SP3 or newer) as a participant
 If CANoe is connected to the SIL Kit, all CAN traffic is visible there as well. You can also execute a test unit which checks if the CAN messages are being transmitted as expected.
 
 Before you can connect CANoe to the SIL Kit network you should adapt the `RegistryUri` in `/SocketCAN/demos/CANoe_SILKit_config.silkit.yaml` to the IP address of your system where your sil-kit-registry is running. 
