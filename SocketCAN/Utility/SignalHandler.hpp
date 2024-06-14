@@ -19,6 +19,8 @@ LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. */
 #include <functional>
+#include <future>
+#include <iostream>
 
 namespace adapters {
 
@@ -29,4 +31,19 @@ namespace adapters {
 using SignalHandler = std::function<void(int)>;
 void RegisterSignalHandler(SignalHandler handler);
 
+inline void PromptForExit()
+{
+    std::promise<int> signalPromise;
+    auto signalValue = signalPromise.get_future();
+    RegisterSignalHandler([&signalPromise](auto sigNum) {
+        signalPromise.set_value(sigNum);
+    });
+
+    std::cout << "Press CTRL + C to stop the process..." << std::endl;
+
+    signalValue.wait();
+
+    std::cout << "\nSignal " << signalValue.get() << " received!" << std::endl;
+    std::cout << "Exiting..." << std::endl;
+}
 } // namespace adapters

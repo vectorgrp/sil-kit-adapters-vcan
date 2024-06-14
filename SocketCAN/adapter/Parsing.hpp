@@ -115,4 +115,5 @@ extern const std::string participantNameArg;
 /// </summary>
 extern const std::string helpArg;
 
+
 } // namespace adapters

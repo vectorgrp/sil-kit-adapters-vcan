@@ -11,7 +11,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(SILKIT_ADAPTERS_VCAN_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin")
 set(SILKIT_ADAPTERS_VCAN_LIBRARY_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/lib")
 
-set(SILKIT_VERSION "4.0.43" CACHE STRING "If no SIL Kit package is specified, this version will be downloaded")
+set(SILKIT_VERSION "4.0.50" CACHE STRING "If no SIL Kit package is specified, this version will be downloaded")
 set(SILKIT_FLAVOR "ubuntu-18.04-x86_64-gcc" CACHE STRING "If no SIL Kit package is specified, this package flavor will be downloaded")
 
 find_package(Threads REQUIRED)
@@ -94,9 +94,9 @@ install(
 )
 
 install(
-    FILES            
-        ${CMAKE_CURRENT_SOURCE_DIR}/SocketCAN/demos/shell_scripts/OpenVCan_can0.sh
-        ${CMAKE_CURRENT_SOURCE_DIR}/SocketCAN/demos/shell_scripts/SendSocketCANFrames.sh
+    FILES
+        ${CMAKE_CURRENT_SOURCE_DIR}/SocketCAN/demos/shell_scripts/setup_vCAN_device.sh
+        ${CMAKE_CURRENT_SOURCE_DIR}/SocketCAN/demos/shell_scripts/send_CAN_frames.sh
         ${CMAKE_CURRENT_SOURCE_DIR}/SocketCAN/demos/shell_scripts/setup_vCAN_start_adapter_send_frames.sh
     DESTINATION SocketCAN/demos/shell_scripts
     PERMISSIONS

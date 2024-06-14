@@ -1,8 +1,0 @@
-version: 2.1.0
-test-tree:
-  - test-fixture: CAN_test    
-    elements:
-      - capl-test-case: testWaitForCAN_msg_ID
-      - capl-test-case: testWaitForEcho_msg_ID
-      - capl-test-case: testWaitForCAN_msg_Content
-      - capl-test-case: testWaitForEcho_msg_Content

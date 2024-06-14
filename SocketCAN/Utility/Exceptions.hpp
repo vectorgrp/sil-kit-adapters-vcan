@@ -58,10 +58,15 @@ class InvalidCli : public std::exception
 {
 };
 
-struct InvalidFileDescriptor : public std::runtime_error
+struct UnsupportedCANFrame : public std::runtime_error
 {
-    InvalidFileDescriptor()
-        : std::runtime_error("an invalid vCAN device has been passed to the adapter." )
+    UnsupportedCANFrame(): std::runtime_error("CAN frame is not supported by the connected vCAN device."){}
+};
+
+struct InvalidVirtualCANDevice : public std::runtime_error
+{
+    InvalidVirtualCANDevice()
+        : std::runtime_error("An invalid or not supported virtual CAN device has been passed to the adapter." )
     {
     }
 };
@@ -74,7 +79,8 @@ void throwIf(bool b)
 }
 
 inline auto& throwInvalidCliIf = throwIf<InvalidCli>;
-inline auto& throwInvalidFileDescriptorIf = throwIf<InvalidFileDescriptor>;
+inline auto& throwInvalidFileDescriptorIf = throwIf<InvalidVirtualCANDevice>;
+inline auto& throwInvalidCANFrameIf = throwIf<UnsupportedCANFrame>;
 
 } // namespace exceptions
 

@@ -14,10 +14,8 @@ const std::string adapters::participantNameArg = "--name";
 const std::string adapters::helpArg = "--help";
 const std::string adapters::configurationArg = "--configuration";
 
-
 const std::array<std::string, 6> switchesWithArgument = {adapters::networkArg, adapters::canNameArg, adapters::regUriArg,          
                                                         adapters::logLevelArg, adapters::participantNameArg, adapters::configurationArg};
-;
 
 const std::array<std::string, 1> switchesWithoutArguments = {adapters::helpArg};
 

@@ -11,19 +11,13 @@
             "cacheVariables": {                
                 "CMAKE_C_COMPILER": "gcc",
                 "CMAKE_CXX_COMPILER": "g++",
-                "SILKIT_VERSION": "4.0.43",
+                "SILKIT_VERSION": "4.0.50",
                 "SILKIT_FLAVOR": "ubuntu-18.04-x86_64-gcc"
             },
             "condition": {
                 "type": "equals",
                 "lhs": "${hostSystemName}",
                 "rhs": "Linux"
-            },
-            "vendor": {
-                "microsoft.com/VisualStudioRemoteSettings/CMake/1.0": {
-                    "sourceDir": "$env{HOME}/.vs/$ms{projectDirName}",
-                    "rsyncCommandArgs": [ "--exclude", "_build" ]
-                }
             }
         },
         {

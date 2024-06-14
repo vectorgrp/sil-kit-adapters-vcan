@@ -31,6 +31,10 @@
 *.out
 *.app
 
+# Test reports 
+*.vtestreport
+*vtestreport.rename
+
 out/
 /out/
 /.vs/
@@ -43,8 +47,8 @@ out/
 /bin/
 /lib/
 /*/build/
-/SocketCAN/demos/CANoe4SW_SE/Default.venvironment/
-/SocketCAN/demos/CANoe4SW_SE/test_CAN_EchoDevice.vtestunit/
-/SocketCAN/demos/CANoe4SW_SE/working-dir/
+/**/Default.venvironment/
+/**/*.vtestunit/
+/**/working-dir/
 /CMakeSettings.json
-/SocketCAN/demos/CANoe/.run
+/**/.run/

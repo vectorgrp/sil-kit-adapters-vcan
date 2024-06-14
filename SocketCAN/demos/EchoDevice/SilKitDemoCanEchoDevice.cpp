@@ -2,38 +2,25 @@
 
 #include <iostream>
 #include <string>
+#include <cstring>
 #include <vector>
-#include <functional>
 
 #include "silkit/SilKit.hpp"
 #include "silkit/config/all.hpp"
 #include "silkit/services/can/all.hpp"
 #include "silkit/services/can/string_utils.hpp"
-#include <asio/ts/buffer.hpp>
 #include "silkit/util/Span.hpp"
+
+#include "Utility/AdapterUtils.hpp"
 #include "adapter/Parsing.hpp"
-#include "adapter/SignalHandler.hpp"
+#include "Utility/SignalHandler.hpp"
 #include "adapter/SilKitAdapterSocketCAN.hpp"
+
 
 using namespace SilKit::Services::Can;
 using namespace adapters;
 using namespace exceptions;
 
-void promptForExit()
-{
-    std::promise<int> signalPromise;
-    auto signalValue = signalPromise.get_future();
-    RegisterSignalHandler([&signalPromise](auto sigNum) {
-        signalPromise.set_value(sigNum);
-    });
-    
-    std::cout << "Press CTRL + C to stop the process..." << std::endl;
-
-    signalValue.wait();
-
-    std::cout << "\nSignal " << signalValue.get() << " received!" << std::endl;
-    std::cout << "Exiting..." << std::endl;
-}
 
 class Device
 {
@@ -42,20 +29,24 @@ public:
     {
     }
 
-public: 
+public:
+
+    // set CAN FD dlc field as a non-linear function of size of data field
+    // see https://elearning.vector.com/mod/page/view.php?id=368
+
     void Process(CanFrame incomingData)
     {
         CanFrame canEchoFrame{};
-        
         // assign an ID to the echo frame (received ID + 1)
+        canEchoFrame = incomingData;
         canEchoFrame.canId = incomingData.canId+1;
         // silkit frame -> char array -> shift array -> silkit frame
-        const unsigned int frameSize = incomingData.dlc;
+        const unsigned int frameSize = incomingData.dataField.size();
         unsigned char tmpFrame[frameSize];
         memcpy(tmpFrame, incomingData.dataField.data(), frameSize);
         shift_left_by_one(tmpFrame, frameSize);
         canEchoFrame.dataField = SilKit::Util::Span<const uint8_t>(tmpFrame, frameSize);
-        canEchoFrame.dlc = canEchoFrame.dataField.size();
+        canEchoFrame.dlc = AdapterUtils::CalculateDLC(incomingData.dataField.size());
         canEchoFrame.flags = incomingData.flags;
         _sendFrameCallback(std::move(canEchoFrame));
     }
@@ -64,9 +55,11 @@ public:
         try
         {
             if (n > 0 && arr != nullptr)
+            {
                 std::memmove(arr, &arr[1], n * sizeof(unsigned char));
-            // set right byte to 0x00
-            arr[n - 1] = 0x00;
+                // set right byte to 0x00
+                arr[n - 1] = 0x00;
+            }
         }
         catch (const std::exception& error)
         {
@@ -133,7 +126,7 @@ int main(int argc, char** argv)
                                     canController->SendFrame(CanFrame{ std::move(data) }, reinterpret_cast<void*>(++transmitId));
                                     
                                     std::ostringstream SILKitDebugMessage;
-                                    SILKitDebugMessage << "Demo >> SIL Kit : CAN frame (dlc=" << (int)data.dlc << " bytes, txId=" << transmitId << ")";
+                                    SILKitDebugMessage << "Demo >> SIL Kit : CAN frame (dlc=" << (int)data.dlc << ", txId=" << transmitId << ")";
                                     logger->Debug(SILKitDebugMessage.str());
                                 }};
 
@@ -141,9 +134,8 @@ int main(int argc, char** argv)
         {
             std::ostringstream SILKitDebugMessage;
 
-            SILKitDebugMessage << "SIL Kit >> Demo: CAN frame (" << msg.frame.dlc << " bytes)";
+            SILKitDebugMessage << "SIL Kit >> Demo: CAN frame (dlc=" << msg.frame.dlc << ")";
             logger->Debug(SILKitDebugMessage.str());
-            std::vector<uint8_t> payloadBytes(msg.frame.dataField.data(), msg.frame.dataField.data() + msg.frame.dlc); 
             demoDevice.Process(std::move(msg.frame));
         };
 
@@ -166,7 +158,7 @@ int main(int argc, char** argv)
         canController->AddFrameTransmitHandler(onCanAckCallback);
         canController->Start();
 
-        promptForExit();
+        PromptForExit();
     }
     catch (const SilKit::ConfigurationError& error)
     {
