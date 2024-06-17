@@ -74,8 +74,6 @@ int main(int argc, char** argv)
             participantConfiguration = SilKit::Config::ParticipantConfigurationFromString(participantConfigurationString);
         }
 
-        const std::string canControllerName = participantName + "_CAN_CTRL";
-
         auto participant = SilKit::CreateParticipant(participantConfiguration, participantName, registryURI);
 
         auto logger = participant->GetLogger();
@@ -95,6 +93,8 @@ int main(int argc, char** argv)
                 }
             });
 
+        const std::string canControllerName = "SilKit_CAN_CTRL_1";
+
         std::ostringstream SILKitInfoMessage;
         SILKitInfoMessage << "Creating CAN controller '" << canControllerName << "'";
         logger->Info(SILKitInfoMessage.str());
@@ -105,7 +105,7 @@ int main(int argc, char** argv)
         can_connection->ReceiveCanFrameFromVirtualCanDevice();
 
         SILKitInfoMessage.str("");
-        SILKitInfoMessage << "Created CAN device connector for [" << canDevName << "] on network [" << canNetworkName << "]";
+        SILKitInfoMessage << "Created CAN device connector for [" << canDevName << "]";
         logger->Info(SILKitInfoMessage.str());
 
         canController->Start();
