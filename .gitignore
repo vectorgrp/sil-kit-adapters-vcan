@@ -52,3 +52,4 @@ out/
 /**/working-dir/
 /CMakeSettings.json
 /**/.run/
+/**/*.stcfg
