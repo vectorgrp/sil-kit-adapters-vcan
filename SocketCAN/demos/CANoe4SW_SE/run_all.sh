@@ -26,7 +26,7 @@ timeout 30s grep -q 'Registered signal handler' <(tail -f /$scriptDir/sil-kit-re
 
 $scriptDir/../shell_scripts/setup_vCAN_start_adapter_send_CAN_frames.sh &> $scriptDir/setup_vCAN_start_adapter_send_CAN_frames.out &
 
-$scriptDir/../../../bin/SilKitDemoCanEchoDevice &> $scriptDir/SilKitDemoCanEchoDevice.out &
+$scriptDir/../../../bin/sil-kit-demo-can-echo-device &> $scriptDir/sil-kit-demo-can-echo-device.out &
 
 $scriptDir/run.sh
 

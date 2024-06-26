@@ -1,19 +1,19 @@
-add_executable(SilKitDemoCanEchoDevice
+add_executable(sil-kit-demo-can-echo-device
     "SilKitDemoCanEchoDevice.cpp"
     "${CMAKE_SOURCE_DIR}/SocketCAN/adapter/Parsing.cpp"
     "${CMAKE_SOURCE_DIR}/SocketCAN/Utility/SignalHandler.cpp"
 )
-target_include_directories(SilKitDemoCanEchoDevice 
+target_include_directories(sil-kit-demo-can-echo-device 
     PRIVATE
     "${CMAKE_SOURCE_DIR}/SocketCAN/Utility/"
     "${CMAKE_SOURCE_DIR}/SocketCAN/"
 )
-target_link_libraries(SilKitDemoCanEchoDevice
+target_link_libraries(sil-kit-demo-can-echo-device
     PRIVATE
     asio
     SilKit::SilKit
 )
-set_target_properties(SilKitDemoCanEchoDevice 
+set_target_properties(sil-kit-demo-can-echo-device 
     PROPERTIES
     #ensure SilKit shared libraries can be loaded
     INSTALL_RPATH "$ORIGIN/../lib:$ORIGIN"

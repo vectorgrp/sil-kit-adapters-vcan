@@ -56,9 +56,9 @@ Now is a good point to start the `sil-kit-registry` on your Linux host:
 
     /path/to/SilKit-x.y.z-$ubuntu/SilKit/bin/sil-kit-registry --listen-uri 'silkit://0.0.0.0:8501'
 
-After that, launch the SilKitAdapterSocketCAN on the Linux host as well:
+After that, launch the sil-kit-adapter-vcan on the Linux host as well:
 
-    ./bin/SilKitAdapterSocketCAN --configuration ./SocketCAN/demos/SilKitConfig_Adapter.silkit.yaml
+    ./bin/sil-kit-adapter-vcan --configuration ./SocketCAN/demos/SilKitConfig_Adapter.silkit.yaml
 
 You should see the following output in the terminal where the adapter was launched: 
 
@@ -106,11 +106,11 @@ done
 ```
 Any SIL Kit participants connected to the same SIL Kit `CAN1` network will be able to exchange CAN frames from `can0` vCAN device.   
 
-In a separate Terminal, launch the CanEchoDevice. This will connect it to SIL Kit's `CAN1` network by default.
+In a separate Terminal, launch the sil-kit-demo-can-echo-device. This will connect it to SIL Kit's `CAN1` network by default.
 ```
-./bin/SilKitDemoCanEchoDevice --log Debug
+./bin/sil-kit-demo-can-echo-device --log Debug
 ```
-You should see the following output in the terminal after launching the CanEchoDevice:
+You should see the following output in the terminal after launching the sil-kit-demo-can-echo-device:
 ```
 [date time] [CanEchoDevice] [info] Creating participant 'CanEchoDevice' at 'silkit://localhost:8501', SIL Kit version: 4.0.36
 [date time] [CanEchoDevice] [info] Connected to registry at 'tcp://127.0.0.1:8501' via 'tcp://127.0.0.1:35464' (silkit://localhost:8501)
@@ -136,7 +136,7 @@ You can read the CAN frames that are transmitted by the QEMU image on Linux host
 ```
 candump can0
 ```
-If both the previously-mentioned `cansend` loop and the `CanEchoDevice` are running along with the SilKitAdapterSocketCAN, you should see output similar to the following in the terminal:
+If both the previously-mentioned `cansend` loop and the `sil-kit-demo-can-echo-device` are running along with the sil-kit-adapter-vcan, you should see output similar to the following in the terminal:
 ```
 can0  001   [4]  AA AA BB BB
 can0  002   [4]  AA BB BB 00
@@ -145,7 +145,7 @@ can0  002   [4]  AA BB BB 00
 . 
 .
 ```
-As described earlier, CAN messages with ID of 001 are the ones sent from the QEMU image. On the other hand, the ones with ID 002 have been sent back from the CanEchoDevice after increasing ID by `1` and applying a shift-left of data by one byte.  
+As described earlier, CAN messages with ID of 001 are the ones sent from the QEMU image. On the other hand, the ones with ID 002 have been sent back from the sil-kit-demo-can-echo-device after increasing ID by `1` and applying a shift-left of data by one byte.  
 
 ### Adding CANoe (16 SP3 or newer) as a participant
 It is possible to integrate CANoe (16 SP3 or newer) in the previously-elaborated setup and add it as a SIL Kit participant. The steps to do this are shown here [SocketCAN/README.md](../SocketCAN/README.md#adding-canoe-16-sp3-or-newer-as-a-participant). 

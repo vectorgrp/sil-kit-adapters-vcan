@@ -1,9 +1,9 @@
 ﻿# SocketCAN Demo and Adapter Setup
-This demo consists of SocketCAN interface `can0` which is connected to SIL Kit via `SilKitAdapterSocketCAN`, with the latter being a SIL Kit participant connected to `CAN1` SIL Kit network. 
+This demo consists of SocketCAN interface `can0` which is connected to SIL Kit via `sil-kit-adapter-vcan`, with the latter being a SIL Kit participant connected to `CAN1` SIL Kit network. 
 For demonstration purposes, another SIL Kit participant `CanEchoDevice` is connected to the same `CAN1` SIL Kit network.   
 
-First, a virtual CAN interface (SocketCAN) is set up in Linux using a shell script. Then, the `SilKitAdapterSocketCAN` is launched, binding to the virtual CAN interface from one side and connecting to SIL Kit as a participant from the other. 
-After that the `CanEchoDevice` is launched and its connection to SIL Kit is established. 
+First, a virtual CAN interface (SocketCAN) is set up in Linux using a shell script. Then, the `sil-kit-adapter-vcan` is launched, binding to the virtual CAN interface from one side and connecting to SIL Kit as a participant from the other. 
+After that the `sil-kit-demo-can-echo-device` is launched and its connection to SIL Kit is established. 
 When all the connections are set up, a shell script is run to generate CAN payload on `can0` SocketCAN interface. 
 
 The following sketch shows the general setup: 
@@ -26,10 +26,10 @@ The following sketch shows the general setup:
     +-----------------------------------------+                      |                                       |
 
 
-## CanEchoDevice
+## sil-kit-demo-can-echo-device
 
 This demo application implements a very simple SIL Kit participant that connects to the SIL Kit `CAN1` network, to which both the SocketCAN Adapter and CANoe can connect as SIL Kit 
-participants in order to exchange CAN frames. The `CanEchoDevice` responds to CAN messages it receives on `CAN1` network by incrementing the received CAN ID by `1` and shifitng the data field by one byte to the left, then sending it back on the same `CAN1` network.
+participants in order to exchange CAN frames. The `sil-kit-demo-can-echo-device` responds to CAN messages it receives on `CAN1` network by incrementing the received CAN ID by `1` and shifitng the data field by one byte to the left, then sending it back on the same `CAN1` network.
 
 # Running the Demos
 
@@ -74,9 +74,9 @@ Now is a good point to start the `sil-kit-registry`:
 
     ./path/to/SilKit-x.y.z-$ubuntu/SilKit/bin/sil-kit-registry --listen-uri 'silkit://0.0.0.0:8501'
 
-After that, launch the SilKitAdapterSocketCAN
+After that, launch the sil-kit-adapter-vcan
 
-    ./bin/SilKitAdapterSocketCAN --configuration ./SocketCAN/demos/SilKitConfig_Adapter.silkit.yaml
+    ./bin/sil-kit-adapter-vcan --configuration ./SocketCAN/demos/SilKitConfig_Adapter.silkit.yaml
 
 You should see the following output in the terminal where the adapter was launched: 
 
@@ -108,11 +108,11 @@ You should see also a `SilKitAdapterSocketCAN` participant announcement in the S
 
     [date time] [SilKitRegistry] [info] Sending known participant message to SilKitAdapterSocketCAN, protocol version 3.1
 
-In a separate Terminal, launch the CanEchoDevice
+In a separate Terminal, launch the sil-kit-demo-can-echo-device
 
-    ./bin/SilKitDemoCanEchoDevice
+    ./bin/sil-kit-demo-can-echo-device
 
-You should see the following output in the terminal after launching the CanEchoDevice:
+You should see the following output in the terminal after launching the sil-kit-demo-can-echo-device:
 
     Creating participant 'CanEchoDevice' at silkit://localhost:8501
     [date time] [CanEchoDevice] [info] Creating participant 'CanEchoDevice' at 'silkit://localhost:8501', SIL Kit version: 4.0.50
@@ -120,7 +120,7 @@ You should see the following output in the terminal after launching the CanEchoD
     [date time] [CanEchoDevice] [info] Creating CAN controller 'CanEchoDevice_CAN1'
     Press CTRL + C to stop the process...
 
-**Note:** You can launch `SilKitDemoCanEchoDevice` with `--log Debug` argument if you want to see the CAN payload traffic logs. 
+**Note:** You can launch `sil-kit-demo-can-echo-device` with `--log Debug` argument if you want to see the CAN payload traffic logs. 
 
 You should also see a `CanEchoDevice` participant announcement in the SIL Kit registry terminal:
 
@@ -132,7 +132,7 @@ You can read data that is available on the `can0` vCAN device. To do this you ca
 
     candump can0
 
-If both Classical CAN and CAN FD frames are being generated and the CanEchoDevice is running along with the SilKitAdapterSocketCAN, you should see output similar to the following in the terminal:
+If both Classical CAN and CAN FD frames are being generated and the sil-kit-demo-can-echo-device is running along with the sil-kit-adapter-vcan, you should see output similar to the following in the terminal:
     
     can0  001   [4]  AA AA BB BB
     can0  002   [4]  AA BB BB 00
@@ -145,13 +145,13 @@ If both Classical CAN and CAN FD frames are being generated and the CanEchoDevic
     . 
     .
 
-As described earlier, Classical CAN messages with ID of `001` and CAN FD frames with ID of `005` are sent from can0 (outgoing). On the other hand, the ones with ID `002` and `006` are the CanEchoDevice's response to those messages after increasing their ID by `1` and applying a shift-left of data by one byte. 
+As described earlier, Classical CAN messages with ID of `001` and CAN FD frames with ID of `005` are sent from can0 (outgoing). On the other hand, the ones with ID `002` and `006` are the sil-kit-demo-can-echo-device's response to those messages after increasing their ID by `1` and applying a shift-left of data by one byte. 
 
 
 #### Adding CANoe (17 SP3 or newer) as a participant
 If CANoe is connected to the SIL Kit, all CAN traffic is visible there as well. You can also execute a test unit which checks if the CAN messages are being transmitted as expected.
 
-Before you can connect CANoe to the SIL Kit network you should adapt the `RegistryUri` in `/SocketCAN/demos/CANoe_SILKit_config.silkit.yaml` to the IP address of your system where your sil-kit-registry is running. 
+Before you can connect CANoe to the SIL Kit network you should adapt the `RegistryUri` in `SocketCAN/demos/CANoe_SILKit_config.silkit.yaml` to the IP address of your system where your sil-kit-registry is running. 
 The configuration file is referenced by both following CANoe use cases (Desktop Edition and Server Edition).
 
 #### CANoe Desktop Edition
@@ -183,4 +183,4 @@ If both CAN FD and Classical CAN frames are being sent while the SilKitAdapterSo
  
 ![CANDUMP](demos/images/candump_output.png)
 
-CAN frames with ID of `007` and `009` are the ones sent from CANoe Desktop Edition and the ones with ID `008` and `00A` are the response of the CanEchoDevice to those frames, after increasing their ID by 1 and applying a shift-left of data by one byte.
+CAN frames with ID of `007` and `009` are the ones sent from CANoe Desktop Edition and the ones with ID `008` and `00A` are the response of the sil-kit-demo-can-echo-device to those frames, after increasing their ID by 1 and applying a shift-left of data by one byte.

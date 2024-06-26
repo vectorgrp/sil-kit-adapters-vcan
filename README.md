@@ -54,14 +54,14 @@ Download a preview or a release of the Adapter directly from [Vector SIL Kit Ada
 
 You should also download a SIL Kit Release directly from [Vector SIL Kit Releases](https://github.com/vectorgrp/sil-kit/releases). You will need this for being able to start a sil-kit-registry.
 
-## Install the SilKitAdapterSocketCAN (optional)
-If you call the following command (can be done for self build and pre build package after cmake configure) ``SilKitAdapterSocketCAN`` can be called from everywhere without defining a path:  
+## Install the sil-kit-adapter-vcan (optional)
+If you call the following command (can be done for self build and pre build package after cmake configure) ``sil-kit-adapter-vcan`` can be called from everywhere without defining a path:  
 
     sudo cmake --build build --target install
 
 The default installation path will be ``/usr/local/bin``. Be aware that SIL Kit itself also needs to be installed to make this work.
 
-## Run the SilKitAdapterSocketCAN
+## Run the sil-kit-adapter-vcan
 This application allows the user to attach virtual CAN interfaces (``SocketCAN``) running in Linux environment to the
 SIL Kit.
 
@@ -81,7 +81,7 @@ Now you can run the adapter from terminal.
 
 The application *optionally* takes the following command line arguments:
 
-    ./bin/SilKitAdapterSocketCAN [--name <participant name{SilKitAdapterSocketCAN}>]
+    ./bin/sil-kit-adapter-vcan [--name <participant name{SilKitAdapterSocketCAN}>]
                                  [--configuration <path to .silkit.yaml or .json configuration file>]
                                  [--registry-uri silkit://<host{localhost}>:<port{8501}>]
                                  [--log <Trace|Debug|Warn|{Info}|Error|Critical|Off>]
