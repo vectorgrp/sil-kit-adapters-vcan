@@ -68,6 +68,11 @@ For this demo purposes, generate some CAN FD traffic on the same vCAN device as 
 
 As of now, a virtual CAN `can0` device is up and running and a Classical CAN message `001#AAAABBBB` and a CAN FD message `005#AAAAAAAABBBBBBBBCCCCCCDD` are continuously being sent on it.
 
+> To send the two previously mentioned frames using `cansend`, you can do as follows:
+> 
+>       cansend can0 001#AAAABBBB 
+>       cansend can0 005##0.AAAAAAAABBBBBBBBCCCCCCDD 
+  
 ## Running the Demo Applications
 
 Now is a good point to start the `sil-kit-registry`:
