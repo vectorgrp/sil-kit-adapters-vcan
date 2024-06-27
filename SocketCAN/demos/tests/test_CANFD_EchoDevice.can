@@ -1,7 +1,6 @@
 ﻿/*@!Encoding:65001*/
 includes
 {
-  
 }
 
 variables
@@ -11,10 +10,10 @@ variables
   long res1, res2, res3;
   dword timeout = 1000; 
 
-  message CAN1.CAN_MSG expected_CAN_frame;  
-  message CAN1.CAN_ECHO_MSG expected_CAN_echo_frame;
-  message CAN1.CAN_FD_MSG expected_CAN_FD_frame;  
-  message CAN1.CAN_FD_ECHO_MSG expected_CAN_FD_echo_frame;
+  message CAN1.CAN_MSG received_CAN_frame;
+  message CAN1.CAN_ECHO_MSG received_CAN_echo_frame;
+  message CAN1.CAN_FD_MSG received_CAN_FD_frame;
+  message CAN1.CAN_FD_ECHO_MSG received_CAN_FD_echo_frame;
 
   float expected_CAN_signal = 0xBBBBAAAA;
   float expected_CAN_echo_signal = 0x00BBBBAA;
@@ -24,7 +23,7 @@ variables
   float expected_CAN_FD_echo_signal_1 = 0xAAAAAABB;
   float expected_CAN_FD_echo_signal_2 = 0xBBBBBBCC; 
   float expected_CAN_FD_echo_signal_3 = 0xCCCCDD00; 
-  float expected_CAN_FD_echo_signal = 0x00DDCCBB; 
+  float expected_CAN_FD_echo_signal = 0x00DDCCBB;
 }
 
 void CheckTestResult(char testName[], int result)
@@ -39,11 +38,11 @@ void CheckTestResult(char testName[], int result)
   }
   else if(result == 0)
   {
-    TestStepFail(testName, "FAILED: No message within timeout");
+      TestStepFail(testName, "FAILED: No message within timeout");
   }
   else if(result == 1)
   {
-    TestStepPass(testName, "SUCCESS");
+      TestStepPass(testName, "SUCCESS: Expected message has been received");
   }
   else
   {
@@ -53,13 +52,13 @@ void CheckTestResult(char testName[], int result)
 
 export testcase testWaitForCAN_msg_ID()
 {  
-    result_ID = TestWaitForMessage(expected_CAN_frame.id, timeout);
+    result_ID = TestWaitForMessage(received_CAN_frame.id, timeout);
     CheckTestResult("testWaitForCAN_msg_ID", result_ID);
 }
 
 export testcase testWaitForEcho_msg_ID()
 { 
-    result_ID = testWaitForMessage(expected_CAN_echo_frame.id, timeout);
+    result_ID = testWaitForMessage(received_CAN_echo_frame.id, timeout);
     CheckTestResult("testWaitForEcho_msg_ID", result_ID);
 }
 
@@ -77,13 +76,13 @@ export testcase testWaitForEcho_msg_Content()
 
 export testcase testWaitForCAN_FD_msg_ID()
 {  
-    result_ID = TestWaitForMessage(expected_CAN_FD_frame.id, timeout);
+    result_ID = TestWaitForMessage(received_CAN_FD_frame.id, timeout);
     CheckTestResult("testWaitForCAN_FD_msg_ID", result_ID);
 }
 
 export testcase testWaitForEcho_FD_msg_ID()
 { 
-    result_ID = testWaitForMessage(expected_CAN_FD_echo_frame.id, timeout);
+    result_ID = testWaitForMessage(received_CAN_FD_echo_frame.id, timeout);
     CheckTestResult("testWaitForEcho_FD_msg_ID", result_ID);
 }
 
@@ -92,7 +91,7 @@ export testcase testWaitForCAN_FD_msg_Content()
     res1 = testWaitForSignalMatch(CAN_FD_MSG::CAN_FD_SIGNAL_1, expected_CAN_FD_signal_1, timeout);
     res2 = testWaitForSignalMatch(CAN_FD_MSG::CAN_FD_SIGNAL_2, expected_CAN_FD_signal_2, timeout);
     res3 = testWaitForSignalMatch(CAN_FD_MSG::CAN_FD_SIGNAL_3, expected_CAN_FD_signal_3, timeout);
-    result_Message = ((res1 == 1) && (res2==1) && (res3==1)) ? 1 : 0; // check if the 3 signals are present in the received CAN FD message
+    result_Message = ((res1 == 1) && (res2 == 1) && (res3 == 1)) ? 1 : 0; // check if the 3 signals are present in the received CAN FD message
     CheckTestResult("testWaitForCAN_FD_msg_Content", result_Message);
 }
 
@@ -101,6 +100,6 @@ export testcase testWaitForEcho_FD_msg_Content()
     res1 = testWaitForSignalMatch(CAN_FD_ECHO_MSG::CAN_FD_SIGNAL_1, expected_CAN_FD_echo_signal_1, timeout);
     res2 = testWaitForSignalMatch(CAN_FD_ECHO_MSG::CAN_FD_SIGNAL_2, expected_CAN_FD_echo_signal_2, timeout);
     res3 = testWaitForSignalMatch(CAN_FD_ECHO_MSG::CAN_FD_SIGNAL_3, expected_CAN_FD_echo_signal_3, timeout);
-    result_Message = ((res1 == 1) && (res2==1) && (res3==1)) ? 1 : 0; // check if both signals are present in the received CAN FD message
+    result_Message = ((res1 == 1) && (res2 == 1) && (res3 == 1)) ? 1 : 0; // check if the 3 signals are present in the received CAN FD message
     CheckTestResult("testWaitForEcho_FD_msg_Content", result_Message);
-}   
+}

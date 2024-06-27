@@ -11,9 +11,16 @@ if [[ $EUID -ne 0 ]]; then
     exit 1
 fi
 
+if [[ $1 == "-mtu16" || -z $1 ]]; then
+  arg=$1
+else
+  echo "[Error] Invalid argument. Use -mtu16 to set the MTU to 16."
+  exit 1
+fi
+
 # Setup an FD-capable vCAN device (default case)
 echo "Setting up [can0]..."
-$SCRIPT_DIR/setup_vCAN_device.sh can0 &> $SCRIPT_DIR/setup_vCAN_device_can0.out
+$SCRIPT_DIR/setup_vCAN_device.sh can0 $arg &> $SCRIPT_DIR/setup_vCAN_device_can0$arg.out
 
 # Start adapter 
 echo "Starting sil-kit-adapter-vcan..."
@@ -25,11 +32,11 @@ sleep 1 # wait 1 second for the creation/existence of the .out file
 timeout 30s grep -q 'Press CTRL + C to stop the process...' <(tail -f /$SCRIPT_DIR/sil-kit-adapter-vcan.out) || { echo "[error] Timeout reached while waiting for sil-kit-adapter-vcan to start"; exit 1; }
 echo "sil-kit-adapter-vcan has been started"
 
+
 # Send frames on [can0] 
 echo "Sending Classical CAN frames on [can0]..."
 $SCRIPT_DIR/send_CAN_frames.sh can0 &> $SCRIPT_DIR/send_ClassicalCAN_frames.out &
 echo "Sending CAN FD frames on [can0]..."
 $SCRIPT_DIR/send_CAN_frames.sh can0 -fd &> $SCRIPT_DIR/send_CANFD_frames.out &
 
-# Wait for the SendSocketCANFrames process to complete (300 frames @ 2Hz -> 150 sec maximum wait)
 sleep 15

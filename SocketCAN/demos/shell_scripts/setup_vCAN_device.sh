@@ -4,8 +4,6 @@
 # It takes a mandatory <vCAN device name> argument and an optional [-mtu16] flag
 # If the [-mtu16] flag is provided, the resulting vCAN device will have a small MTU, for testing purposes
 
-SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
-
 # Check if user is root
 if [[ $EUID -ne 0 ]]; then
     echo "This script must be run as root / via sudo!"

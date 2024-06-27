@@ -154,22 +154,32 @@ As described earlier, Classical CAN messages with ID of `001` and CAN FD frames 
 
 
 #### Adding CANoe (17 SP3 or newer) as a participant
+
 If CANoe is connected to the SIL Kit, all CAN traffic is visible there as well. You can also execute a test unit which checks if the CAN messages are being transmitted as expected.
 
 Before you can connect CANoe to the SIL Kit network you should adapt the `RegistryUri` in `SocketCAN/demos/CANoe_SILKit_config.silkit.yaml` to the IP address of your system where your sil-kit-registry is running. 
+
 The configuration file is referenced by both following CANoe use cases (Desktop Edition and Server Edition).
 
 #### CANoe Desktop Edition
-Load the `CANoe_vCAN_configuration.cfg` from the `demos/CANoe` directory and start the measurement. Optionally you can also start the test unit execution of included test configuration.
+Load the `CANoe_vCAN_configuration.cfg` from the `demos/CANoe` directory and start the measurement. Optionally you can also start the test unit execution of the `CAN_and_CAN_FD` test configuration.
+
 While the demo is running these tests should be successful.
 
+> The `ClassicalCAN` test configuration expects CAN traffic from the adapter connected to a vCAN device that is not CAN FD capable (a vCAN device with MTU=16).
+
 #### CANoe4SW Server Edition (Windows)
-You can also run the same test set with `CANoe4SW SE` by executing the following powershell script `demos/CANoe4SW_SE/run.ps1`. 
+You can also run the same test set with `CANoe4SW SE` by executing the following powershell script `demos/CANoe4SW_SE/run.ps1`.
 The test cases are executed automatically and you should see a short test report in powershell after execution.
+
+> Similar to the `ClassicalCAN` test configuration, you can run the test subset that only applies to vCAN devices with MTU of 16. 
+> To do that, run the script as follows: `demos/CANoe4SW_SE/run.ps1 -mtu16`.
 
 #### CANoe4SW Server Edition (Linux)
 You can also run the same test set with `CANoe4SW SE (Linux)`. At first you have to execute the powershell script `demos/CANoe4SW_SE/createEnvForLinux.ps1` on your windows system by using tools of `CANoe4SW SE (Windows)` to prepare your test environment for Linux. 
 In `demos/CANoe4SW_SE/run.sh` you should adapt `canoe4sw_se_install_dir` to the path of your `CANoe4SW SE` installation in your Linux system. Afterwards you can execute `demos/CANoe4SW_SE/run.sh` in your Linux system. The test cases are executed automatically and you should see a short test report in your terminal after execution.
+
+> If you are testing a vCAN device with `MTU=16`, similarly adapt and run the script as follows: `demos/CANoe4SW_SE/run.sh -mtu16`.
 
 ### Generating CAN data in CANoe Desktop Edition 
 This is done with the same previous setup, but instead of generating CAN traffic on the vCAN device (in Linux, by running the `send_CAN_frames.sh` script ), CANoe Desktop Edition is the source of CAN payload.  

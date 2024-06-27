@@ -13,14 +13,26 @@ else
 fi
 
 if [[ -n "$canoe4sw_se_install_dir" ]]; then
-	echo "canoe4sw-se found at location : $canoe4sw_se_install_dir"
+	echo "canoe4sw-se found at location: $canoe4sw_se_install_dir"
+	$canoe4sw_se_install_dir/canoe4sw-se --version
 	#run tests
-	$canoe4sw_se_install_dir/canoe4sw-se "$script_root/Default.venvironment" -d "$script_root/working-dir" --verbosity-level "2" --test-unit "$script_root/test_CANFD_EchoDevice.vtestunit"  --show-progress "tree-element"
+  if [ $# -gt 0 ]; then # Check if an argument is passed
+    if [ "$1" == "-mtu16" ]; then # Check if the passed argument equals '-mtu16'
+      echo "Running tests for MTU 16 vCAN devices."
+      $canoe4sw_se_install_dir/canoe4sw-se "$script_root/Default.venvironment" -d "$script_root/working-dir" --verbosity-level "2" --test-unit "$script_root/test_CAN_EchoDevice.vtestunit"  --show-progress "tree-element"
+    else
+      echo "[Error] Unknown argument has been passed to run.sh script, terminating."
+      exit_status=1
+    fi
+  else
+    echo "Running tests for MTU 72 vCAN devices."
+    $canoe4sw_se_install_dir/canoe4sw-se "$script_root/Default.venvironment" -d "$script_root/working-dir" --verbosity-level "2" --test-unit "$script_root/test_CANFD_EchoDevice.vtestunit"  --show-progress "tree-element"
+  fi
 
 	exit_status=$?
 else
     echo "canoe4sw-se executable not found"
-    exit_status=-1
+    exit_status=1
 fi
 
 exit $exit_status

@@ -52,4 +52,7 @@ out/
 /**/working-dir/
 /CMakeSettings.json
 /**/.run/
+*.ini
+*.settings
+*.xpa
 /**/*.stcfg

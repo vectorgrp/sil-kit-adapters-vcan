@@ -18,10 +18,8 @@ if [[ $2 == "-fd" ]]; then
     echo "[info] Starting sending CAN FD frames on [$can_device]..."
     for (( i = 1; i <= $N_FRAMES ; i++ ))
     do
-    	ID=$CAN_FD_ID
-    	PL=$CAN_FD_PAYLOAD
         # Send CAN FD frame with ID 005 and 64 bytes of data
-        cansend $can_device $ID##0.$PL
+        cansend $can_device $CAN_FD_ID##0.$CAN_FD_PAYLOAD
         echo "Frame $i : {"$CAN_FD_ID##0.$CAN_FD_PAYLOAD"} sent to [$can_device]"
         sleep 0.5
     done
