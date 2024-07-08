@@ -28,7 +28,7 @@ The first thing that you should do is initializing the submodules to fetch the r
 
 Otherwise clone the standalone version of asio manually:
 
-    git clone --branch asio-1-18-2 https://github.com/chriskohlhoff/asio.git third_party/asio
+    git clone --branch asio-1-24-0 https://github.com/chriskohlhoff/asio.git third_party/asio
 
 ### Build the Adapter
 To build the adapter, you'll need an ubuntu SIL Kit package ``SilKit-x.y.z-$ubuntu``. You can download it directly from [Vector SIL Kit Releases](https://github.com/vectorgrp/sil-kit/releases). The easiest way would be to download it with your web browser, unzip it and place it on your file system, where it also can be accessed by ``bash``.
