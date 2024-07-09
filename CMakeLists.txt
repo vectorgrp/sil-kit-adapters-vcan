@@ -97,7 +97,7 @@ install(
     FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/SocketCAN/demos/shell_scripts/setup_vCAN_device.sh
         ${CMAKE_CURRENT_SOURCE_DIR}/SocketCAN/demos/shell_scripts/send_CAN_frames.sh
-        ${CMAKE_CURRENT_SOURCE_DIR}/SocketCAN/demos/shell_scripts/setup_vCAN_start_adapter_send_frames.sh
+        ${CMAKE_CURRENT_SOURCE_DIR}/SocketCAN/demos/shell_scripts/setup_vCAN_start_adapter_send_CAN_frames.sh
     DESTINATION SocketCAN/demos/shell_scripts
     PERMISSIONS
         OWNER_READ OWNER_WRITE OWNER_EXECUTE
