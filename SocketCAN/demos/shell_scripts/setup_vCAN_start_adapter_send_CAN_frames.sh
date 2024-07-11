@@ -6,7 +6,7 @@ logDir=$scriptDir/../CANoe4SW_SE/logs # define a directory for .out files
 mkdir -p $logDir # if it does not exist, create it
 
 # cleanup trap for child processes 
-trap 'kill $(jobs -p); exit' EXIT SIGHUP;
+trap 'kill $(jobs -p); ip link set down can0; ip link delete can0 type vcan; exit' EXIT SIGHUP;
 
 # check if user is root
 if [[ $EUID -ne 0 ]]; then

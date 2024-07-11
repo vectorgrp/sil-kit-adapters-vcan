@@ -33,7 +33,7 @@ modprobe vcan
 
 # If interface exists and is up, delete it
 if ip link show $vcan_device_name | grep -q "<NOARP,UP,LOWER_UP>" ; then
-  	echo "[$vcan_device_name] interface is already exists. Deleting..."
+  	echo "[$vcan_device_name] interface already exists. Deleting..."
 	ip link set down $vcan_device_name
 	ip link delete $vcan_device_name type vcan
 	echo "[$vcan_device_name] deleted."
