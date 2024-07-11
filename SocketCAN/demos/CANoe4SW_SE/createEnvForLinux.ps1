@@ -41,10 +41,10 @@ if($ipAddressNotEmpty)
 		Write-Host "Done."
 	}
 	else {
-		Write-Host "[Warning] Passed IP address does not have a right format, noting will be copied to remote."
+		Write-Host "[Warning] Passed IP address does not have a right format, nothing will be copied to remote."
 	}
 }
 else {
-	Write-Host "[Info] No IP address has been passed, noting will be copied to remote."
+	Write-Host "[Info] No IP address has been passed, nothing will be copied to remote."
 }
 
