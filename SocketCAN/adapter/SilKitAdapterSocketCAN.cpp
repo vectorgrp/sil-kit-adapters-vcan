@@ -30,7 +30,7 @@ int main(int argc, char** argv)
 
     const std::string configurationFile = getArgDefault(argc, argv, configurationArg, "");
     const std::string registryURI = getArgDefault(argc, argv, regUriArg, "silkit://localhost:8501");
-    const std::string participantName = getArgDefault(argc, argv, participantNameArg, "SilKitAdapterSocketCAN");
+    const std::string participantName = getArgDefault(argc, argv, participantNameArg, "SilKitAdapterVcan");
 
     const std::string canDevName = getArgDefault(argc, argv, canNameArg, "can0");
     const std::string canNetworkName = getArgDefault(argc, argv, networkArg, "CAN1");

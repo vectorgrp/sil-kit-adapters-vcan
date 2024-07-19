@@ -16,7 +16,7 @@ using namespace exceptions;
 using namespace std;
 using namespace SilKit::Services::Can;
 
-// Implements the connection with the vCAN device
+// Implements the connection with the vcan device
 class CanConnection : public std::enable_shared_from_this<CanConnection>
 {
 private:
@@ -29,7 +29,7 @@ public:
     void ReceiveCanFrameFromVirtualCanDevice();
 
 private:
-    // Interrogates vCAN device "canDeviceName", binds to it and sets the _vcanDevice member accordingly
+    // Interrogates vcan device "canDeviceName", binds to it and sets the _vcanDevice member accordingly
     void InitialiseVirtualCANConnection(const char* canDeviceName);
     static void InitialiseSILKitCANConnection(ICanController* silkitCtrl, const shared_ptr<CanConnection>& ptr);
 

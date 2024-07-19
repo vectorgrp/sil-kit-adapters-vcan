@@ -14,13 +14,13 @@ $canoe4sw_se_install_dir = $env:CANoe4SWSE_InstallDir64
 
 if($mtu16)
 {
-    Write-Host "[Info] Running tests for MTU 16 vCAN devices."
+    Write-Host "[Info] Running tests for MTU 16 vcan devices."
     #compile test unit
     & $canoe4sw_se_install_dir/test-unit-make.exe "$PSScriptRoot/../tests/test_CAN_EchoDevice.vtestunit.yaml" -e "$PSScriptRoot/Default.venvironment" -o "$PSScriptRoot"
     #run test unit
     & $canoe4sw_se_install_dir/canoe4sw-se.exe "$PSScriptRoot/Default.venvironment" -d "$PSScriptRoot/working-dir" --verbosity-level "2" --test-unit "$PSScriptRoot/test_CAN_EchoDevice.vtestunit"  --show-progress "tree-element"
 }else{
-    Write-Host "[Info] Running tests for MTU 72 vCAN devices."
+    Write-Host "[Info] Running tests for MTU 72 vcan devices."
     #compile test unit
     & $canoe4sw_se_install_dir/test-unit-make.exe "$PSScriptRoot/../tests/test_CANFD_EchoDevice.vtestunit.yaml" -e "$PSScriptRoot/Default.venvironment" -o "$PSScriptRoot"
     #run test unit

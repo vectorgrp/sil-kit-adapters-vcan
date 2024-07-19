@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # This script is uniquely used for testing and demo purposes of the adapter
-# It takes a mandatory <vCAN device name> argument and an optional [-mtu16] flag
-# If the [-mtu16] flag is provided, the resulting vCAN device will have a small MTU, for testing purposes
+# It takes a mandatory <vcan device name> argument and an optional [-mtu16] flag
+# If the [-mtu16] flag is provided, the resulting vcan device will have a small MTU, for testing purposes
 
 # Check if user is root
 if [[ $EUID -ne 0 ]]; then
@@ -28,7 +28,7 @@ if [[ $# -gt 1 ]]; then
     fi
 fi
 
-echo "Loading vCAN kernel module"
+echo "Loading vcan kernel module"
 modprobe vcan
 
 # If interface exists and is up, delete it
@@ -39,7 +39,7 @@ if ip link show $vcan_device_name | grep -q "<NOARP,UP,LOWER_UP>" ; then
 	echo "[$vcan_device_name] deleted."
 fi
 
-# Setup a fresh vCAN device with the specified args
+# Setup a fresh vcan device with the specified args
 echo "Setting up [$vcan_device_name] with MTU=$mtu_value"
 ip link add dev $vcan_device_name type vcan
 ip link set $vcan_device_name mtu $mtu_value
@@ -47,7 +47,7 @@ ip link set up $vcan_device_name
 
 # Make sure all is OK
 if ip link show $vcan_device_name | grep -q "<NOARP,UP,LOWER_UP>"; then
-        echo "vCAN interface [$vcan_device_name] is up & running."
+        echo "vcan interface [$vcan_device_name] is up & running."
 else
-        echo "Something is wrong with vCAN interface [$vcan_device_name]"
+        echo "Something is wrong with vcan interface [$vcan_device_name]"
 fi

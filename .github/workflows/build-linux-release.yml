@@ -7,7 +7,7 @@ on:
 
 jobs:
   linux-release:
-    name: Build SIL Kit vCAN for Release configuration
+    name: Build SIL Kit Adapter vcan for Release configuration
     environment: public-github-runners
     runs-on: ubuntu-20.04
     steps:
@@ -26,6 +26,6 @@ jobs:
           prerelease: true
           draft: true
           files: |
-            _build/linux-release/SilKit-Adapters*.zip
+            _build/linux-release/SilKit-Adapter*.zip
             
           

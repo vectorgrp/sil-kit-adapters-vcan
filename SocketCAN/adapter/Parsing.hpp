@@ -81,7 +81,7 @@ void foreachArgDo(int argc, char** argv, const std::string& argument, const Acti
 }
 
 /// <summary>
-/// string containing the argument preceding the vCAN device name.
+/// string containing the argument preceding the vcan device name.
 /// </summary>
 extern const std::string canNameArg;
 

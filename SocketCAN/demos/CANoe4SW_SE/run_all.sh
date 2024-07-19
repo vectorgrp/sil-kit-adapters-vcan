@@ -34,7 +34,7 @@ $scriptDir/../../../bin/sil-kit-demo-can-echo-device &> $logDir/sil-kit-demo-can
 sleep 1 # wait 1 second for the creation of the .out file
 timeout 30s grep -q 'Press CTRL + C to stop the process...' <(tail -f $logDir/sil-kit-demo-can-echo-device.out -n +1) || { echo "[error] Timeout reached while waiting for sil-kit-demo-can-echo-device to start"; exit 1; }
 
-# Run and test adapter with vCAN device of MTU 72
+# Run and test adapter with vcan device of MTU 72
 $scriptDir/../shell_scripts/setup_vCAN_start_adapter_send_CAN_frames.sh &> $logDir/setup_vCAN_start_adapter_send_CAN_frames.out &
 script_pid=$!
 sleep 1 # wait 1 second for the creation of the .out file
@@ -49,7 +49,7 @@ fi
 
 kill $script_pid
 
-# Run and test adapter with vCAN device of MTU 16
+# Run and test adapter with vcan device of MTU 16
 $scriptDir/../shell_scripts/setup_vCAN_start_adapter_send_CAN_frames.sh -mtu16 &> $logDir/setup_vCAN_start_adapter_send_CAN_frames-mtu16.out &
 sleep 1 # wait 1 second for the creation of the .out file
 timeout 60s grep -q 'Adapter has been launched and CAN payload is being generated...' <(tail -f $logDir/setup_vCAN_start_adapter_send_CAN_frames-mtu16.out -n +1) || { echo "[error] Timeout reached while waiting for (setup_vCAN_start_adapter_send_CAN_frames.sh -mtu16) to start"; exit 1; }

@@ -45,7 +45,7 @@ void CanConnection::ReceiveCanFrameFromVirtualCanDevice()
              {
                  if (ec)
                  {
-                     std::string SILKitErrorMessage = "Unable to receive data from vCAN device.\n"
+                     std::string SILKitErrorMessage = "Unable to receive data from vcan device.\n"
                                                       "Error code: " + std::to_string(ec.value()) + " (" + ec.message() + ")\n"
                                                       "Error category: " + ec.category().name();
                      that->_logger->Error(SILKitErrorMessage);
@@ -67,7 +67,7 @@ void CanConnection::ReceiveCanFrameFromVirtualCanDevice()
          });
 }
 
-// Initialise the connection with the vCAN device, return an initialised VCANDevice object.
+// Initialise the connection with the vcan device, return an initialised VCANDevice object.
 void CanConnection::InitialiseVirtualCANConnection(const char* canDeviceName)
 {
     ifreq ifr{};
@@ -84,7 +84,7 @@ void CanConnection::InitialiseVirtualCANConnection(const char* canDeviceName)
     // Check if canDeviceName is null or too long, IFNAMSIZ is a constant that defines the maximum possible buffer size for an interface name (including its terminating zero byte)
     if (canDeviceName == nullptr || strlen(canDeviceName) >= IFNAMSIZ)
     {
-        _logger->Error("Invalid vCAN device name used for [--can-name] arg.\n"
+        _logger->Error("Invalid vcan device name used for [--can-name] arg.\n"
                        "(Hint): Ensure that the name provided is within a valid length between (1 and " + to_string(IFNAMSIZ-1) + ") characters.");
         close(_vcanDevice.fileDescriptor);
         throw InvalidVirtualCANDevice();
@@ -145,8 +145,8 @@ void CanConnection::InitialiseVirtualCANConnection(const char* canDeviceName)
         }
     }
 
-    _logger->Info("The used " + std::string(canDeviceName) + " vCAN device is" + (_vcanDevice.deviceType== CAN_FD_DEVICE ? "" : " not") + " CAN FD compatible (MTU = " + to_string(ifr.ifr_mtu) +")");
-    _logger->Info("vCAN device [" + std::string(canDeviceName) + "] successfully opened");
+    _logger->Info("The used " + std::string(canDeviceName) + " vcan device is" + (_vcanDevice.deviceType== CAN_FD_DEVICE ? "" : " not") + " CAN FD compatible (MTU = " + to_string(ifr.ifr_mtu) +")");
+    _logger->Info("vcan device [" + std::string(canDeviceName) + "] successfully opened");
 
     throwInvalidFileDescriptorIf((_vcanDevice.fileDescriptor < 0));
 }

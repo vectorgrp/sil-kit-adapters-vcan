@@ -40,12 +40,12 @@ First, run the following command in the Terminal to load the necessary Linux ker
 
 You should see this output that indicates that the `can0` virtual CAN device has been successfully launched:
     
-    Loading vCAN kernel module
+    Loading vcan kernel module
     Device "can0" does not exist.
     Setting up [can0] with MTU=72
-    vCAN interface [can0] is up & running.
+    vcan interface [can0] is up & running.
 
-> Optionally, you can pass the `-mtu16` flag to the script, which will set the MTU (Maximum Transmission Unit) of the opened vCAN device to 16. More on this can be found in the [SocketCAN documentation](https://docs.kernel.org/networking/can.html).
+> Optionally, you can pass the `-mtu16` flag to the script, which will set the MTU (Maximum Transmission Unit) of the opened vcan device to 16. More on this can be found in the [SocketCAN documentation](https://docs.kernel.org/networking/can.html).
 
 Now, you can start sending virtual CAN frames from your terminal. 
 This can be done with the following command
@@ -62,7 +62,7 @@ Run the send_CAN_frames.sh script with `can0` argument to continuously generate 
 
 > You can generate CAN FD traffic by adding the `-fd` flag to the script call.
 
-For this demo purposes, generate some CAN FD traffic on the same vCAN device as follows: 
+For this demo purposes, generate some CAN FD traffic on the same vcan device as follows: 
 
     ./SocketCAN/demos/shell_scripts/send_CAN_frames.sh can0 -fd
 
@@ -85,33 +85,33 @@ After that, launch the sil-kit-adapter-vcan
 
 You should see the following output in the terminal where the adapter was launched: 
 
-    [date time] [SilKitAdapterSocketCAN] [info] Creating participant 'SilKitAdapterSocketCAN' at 'silkit://localhost:8501', SIL Kit version: 4.0.50
-    [date time] [SilKitAdapterSocketCAN] [info] Connected to registry at 'tcp://127.0.0.1:8501' via 'tcp://127.0.0.1:35902' (local:///tmp/SilKitRegi24268eb86b35e799.silkit, tcp://localhost:8501)
-    [date time] [SilKitAdapterSocketCAN] [info] Creating CAN controller 'SilKitAdapterSocketCAN_CAN_CTRL'
-    [date time] [SilKitAdapterSocketCAN] [info] The used can0 vCAN device is CAN FD compatible (MTU = 72)
-    [date time] [SilKitAdapterSocketCAN] [info] vCAN device [can0] successfully opened
-    [date time] [SilKitAdapterSocketCAN] [info] Created CAN device connector for [can0] on network [CAN1]
+    [date time] [SilKitAdapterVcan] [info] Creating participant 'SilKitAdapterVcan' at 'silkit://localhost:8501', SIL Kit version: 4.0.50
+    [date time] [SilKitAdapterVcan] [info] Connected to registry at 'tcp://127.0.0.1:8501' via 'tcp://127.0.0.1:35902' (local:///tmp/SilKitRegi24268eb86b35e799.silkit, tcp://localhost:8501)
+    [date time] [SilKitAdapterVcan] [info] Creating CAN controller 'SilKit_CAN_CTRL_1'
+    [date time] [SilKitAdapterVcan] [info] The used can0 vcan device is CAN FD compatible (MTU = 72)
+    [date time] [SilKitAdapterVcan] [info] vcan device [can0] successfully opened
+    [date time] [SilKitAdapterVcan] [info] Created CAN device connector for [can0] on network [CAN1]
     Press CTRL + C to stop the process...
     .
     .
-    [date time] [SilKitAdapterSocketCAN] [debug] CAN device >> SIL Kit: CAN frame (payload = 4 [bytes] , CAN ID=0x1, txId=10)
-    [date time] [SilKitAdapterSocketCAN] [debug] SIL Kit >> CAN device: CAN frame (payload = 4 [bytes], CAN ID=0x2)
-    [date time] [SilKitAdapterSocketCAN] [debug] SIL Kit >> CAN : ACK for CAN Message with transmitId=10
-    [date time] [SilKitAdapterSocketCAN] [debug] CAN device >> SIL Kit: CAN FD frame (payload = 12 [bytes] , CAN ID=0x5, txId=11)
-    [date time] [SilKitAdapterSocketCAN] [debug] SIL Kit >> CAN device: CAN FD frame (payload = 12 [bytes], CAN ID=0x6)
-    [date time] [SilKitAdapterSocketCAN] [debug] SIL Kit >> CAN : ACK for CAN Message with transmitId=11
-    [date time] [SilKitAdapterSocketCAN] [debug] CAN device >> SIL Kit: CAN frame (payload = 4 [bytes] , CAN ID=0x1, txId=12)
-    [date time] [SilKitAdapterSocketCAN] [debug] SIL Kit >> CAN device: CAN frame (payload = 4 [bytes], CAN ID=0x2)
-    [date time] [SilKitAdapterSocketCAN] [debug] SIL Kit >> CAN : ACK for CAN Message with transmitId=12
-    [date time] [SilKitAdapterSocketCAN] [debug] CAN device >> SIL Kit: CAN FD frame (payload = 12 [bytes] , CAN ID=0x5, txId=13)
-    [date time] [SilKitAdapterSocketCAN] [debug] SIL Kit >> CAN device: CAN FD frame (payload = 12 [bytes], CAN ID=0x6)
-    [date time] [SilKitAdapterSocketCAN] [debug] SIL Kit >> CAN : ACK for CAN Message with transmitId=13
+    [date time] [SilKitAdapterVcan] [debug] CAN device >> SIL Kit: CAN frame (payload = 4 [bytes] , CAN ID=0x1, txId=10)
+    [date time] [SilKitAdapterVcan] [debug] SIL Kit >> CAN device: CAN frame (payload = 4 [bytes], CAN ID=0x2)
+    [date time] [SilKitAdapterVcan] [debug] SIL Kit >> CAN : ACK for CAN Message with transmitId=10
+    [date time] [SilKitAdapterVcan] [debug] CAN device >> SIL Kit: CAN FD frame (payload = 12 [bytes] , CAN ID=0x5, txId=11)
+    [date time] [SilKitAdapterVcan] [debug] SIL Kit >> CAN device: CAN FD frame (payload = 12 [bytes], CAN ID=0x6)
+    [date time] [SilKitAdapterVcan] [debug] SIL Kit >> CAN : ACK for CAN Message with transmitId=11
+    [date time] [SilKitAdapterVcan] [debug] CAN device >> SIL Kit: CAN frame (payload = 4 [bytes] , CAN ID=0x1, txId=12)
+    [date time] [SilKitAdapterVcan] [debug] SIL Kit >> CAN device: CAN frame (payload = 4 [bytes], CAN ID=0x2)
+    [date time] [SilKitAdapterVcan] [debug] SIL Kit >> CAN : ACK for CAN Message with transmitId=12
+    [date time] [SilKitAdapterVcan] [debug] CAN device >> SIL Kit: CAN FD frame (payload = 12 [bytes] , CAN ID=0x5, txId=13)
+    [date time] [SilKitAdapterVcan] [debug] SIL Kit >> CAN device: CAN FD frame (payload = 12 [bytes], CAN ID=0x6)
+    [date time] [SilKitAdapterVcan] [debug] SIL Kit >> CAN : ACK for CAN Message with transmitId=13
 
 You can notice both the Classical CAN frames and CAN FD frames being logged in the adapter's output.
 
-You should see also a `SilKitAdapterSocketCAN` participant announcement in the SIL Kit registry terminal
+You should see also a `SilKitAdapterVcan` participant announcement in the SIL Kit registry terminal
 
-    [date time] [SilKitRegistry] [info] Sending known participant message to SilKitAdapterSocketCAN, protocol version 3.1
+    [date time] [SilKitRegistry] [info] Sending known participant message to SilKitAdapterVcan, protocol version 3.1
 
 In a separate Terminal, launch the sil-kit-demo-can-echo-device
 
@@ -132,8 +132,8 @@ You should also see a `CanEchoDevice` participant announcement in the SIL Kit re
     [date time] [SilKitRegistry] [info] Sending known participant message to CanEchoDevice, protocol version 3.1
 
 
-### Monitoring CAN data generated on `can0` vCAN device  
-You can read data that is available on the `can0` vCAN device. To do this you can use the following command in a separate Terminal:
+### Monitoring CAN data generated on `can0` vcan device  
+You can read data that is available on the `can0` vcan device. To do this you can use the following command in a separate Terminal:
 
     candump can0
 
@@ -166,23 +166,23 @@ Load the `CANoe_vCAN_configuration.cfg` from the `demos/CANoe` directory and sta
 
 While the demo is running these tests should be successful.
 
-> The `ClassicalCAN` test configuration expects CAN traffic from the adapter connected to a vCAN device that is not CAN FD capable (a vCAN device with MTU=16).
+> The `ClassicalCAN` test configuration expects CAN traffic from the adapter connected to a vcan device that is not CAN FD capable (a vcan device with MTU=16).
 
 #### CANoe4SW Server Edition (Windows)
 You can also run the same test set with `CANoe4SW SE` by executing the following powershell script `demos/CANoe4SW_SE/run.ps1`.
 The test cases are executed automatically and you should see a short test report in powershell after execution.
 
-> Similar to the `ClassicalCAN` test configuration, you can run the test subset that only applies to vCAN devices with MTU of 16. 
+> Similar to the `ClassicalCAN` test configuration, you can run the test subset that only applies to vcan devices with MTU of 16. 
 > To do that, run the script as follows: `demos/CANoe4SW_SE/run.ps1 -mtu16`.
 
 #### CANoe4SW Server Edition (Linux)
 You can also run the same test set with `CANoe4SW SE (Linux)`. At first you have to execute the powershell script `demos/CANoe4SW_SE/createEnvForLinux.ps1` on your windows system by using tools of `CANoe4SW SE (Windows)` to prepare your test environment for Linux. 
 In `demos/CANoe4SW_SE/run.sh` you should adapt `canoe4sw_se_install_dir` to the path of your `CANoe4SW SE` installation in your Linux system. Afterwards you can execute `demos/CANoe4SW_SE/run.sh` in your Linux system. The test cases are executed automatically and you should see a short test report in your terminal after execution.
 
-> If you are testing a vCAN device with `MTU=16`, similarly adapt and run the script as follows: `demos/CANoe4SW_SE/run.sh -mtu16`.
+> If you are testing a vcan device with `MTU=16`, similarly adapt and run the script as follows: `demos/CANoe4SW_SE/run.sh -mtu16`.
 
 ### Generating CAN data in CANoe Desktop Edition 
-This is done with the same previous setup, but instead of generating CAN traffic on the vCAN device (in Linux, by running the `send_CAN_frames.sh` script ), CANoe Desktop Edition is the source of CAN payload.  
+This is done with the same previous setup, but instead of generating CAN traffic on the vcan device (in Linux, by running the `send_CAN_frames.sh` script ), CANoe Desktop Edition is the source of CAN payload.  
 
 You can start generating CAN frames in CANoe Desktop Edition using the CAN IG panel: 
 
@@ -190,11 +190,11 @@ You can start generating CAN frames in CANoe Desktop Edition using the CAN IG pa
 
 After starting the measurement, you can toggle sending CAN FD or Classical CAN frames by pressing the corresponding `Send` buttons on the panel.
 
-You can read data that is being received on the `can0` vCAN device
+You can read data that is being received on the `can0` vcan device
 
     candump can0
 
-If both CAN FD and Classical CAN frames are being sent while the SilKitAdapterSocketCAN and the CanEchoDevice are connected, you should see output similar to the following in the terminal:
+If both CAN FD and Classical CAN frames are being sent while the SIL Kit Adapter vcan and the CanEchoDevice are connected, you should see output similar to the following in the terminal:
  
 ![CANDUMP](demos/images/candump_output.png)
 

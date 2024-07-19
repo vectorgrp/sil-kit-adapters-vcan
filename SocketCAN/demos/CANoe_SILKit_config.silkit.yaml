@@ -1,4 +1,4 @@
-Description: Configuration for CANoe participant for SIL Kit Adapter SocketCAN Demo
+Description: Configuration for CANoe participant for SIL Kit Adapter vcan Demo
 Logging:
   Sinks:
     - Level: Info

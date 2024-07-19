@@ -1,6 +1,6 @@
 # Connecting a QEMU image with a SocketCAN Interface to SIL Kit
 
-This demonstration illustrates the utilization of the SIL Kit vCAN Adapter to establish a connection between a QEMU image equipped with a SocketCAN Interface and the Vector SIL Kit.
+This demonstration illustrates the utilization of the SIL Kit Adapter vcan to establish a connection between a QEMU image equipped with a SocketCAN Interface and the Vector SIL Kit.
 
 A comprehensive, step-by-step guide is provided to generate CAN traffic from within a QEMU image, which is then routed through a CAN interface provided by the QEMU image itself. The adapter is designed to manage this traffic, ensuring that CAN frames are efficiently transmitted to and from the SIL Kit CAN network.
 
@@ -25,7 +25,7 @@ After building the QEMU image, modify the `path/to/sil-kit-adapters-qemu/tools/r
 This creates a virtual CAN bus `canbus0` which can be connected to the host system using the SocketCAN protocol, through the `can0` interface.
 
 ### 3- Running the QEMU image 
-In order to run the QEMU image, a `can0` vCAN device needs to be up and running on the host. 
+In order to run the QEMU image, a `can0` vcan device needs to be up and running on the host. 
 This can be done by executing the following commands:
 
 ```
@@ -62,32 +62,32 @@ After that, launch the sil-kit-adapter-vcan on the Linux host as well:
 
 You should see the following output in the terminal where the adapter was launched: 
 
-    [date time] [SilKitAdapterSocketCAN] [info] Creating participant 'SilKitAdapterSocketCAN' at 'silkit://localhost:8501', SIL Kit version: 4.0.45
+    [date time] [SilKitAdapterVcan] [info] Creating participant 'SilKitAdapterVcan' at 'silkit://localhost:8501', SIL Kit version: 4.0.45
     ...
-    [date time] [SilKitAdapterSocketCAN] [info] Creating CAN controller 'SilKitAdapterSocketCAN_CAN_CTRL'
+    [date time] [SilKitAdapterVcan] [info] Creating CAN controller 'SilKit_CAN_CTRL_1'
     ...
-    [date time] [SilKitAdapterSocketCAN] [info] vCAN device [can0] successfully opened
-    [date time] [SilKitAdapterSocketCAN] [info] Created CAN device connector for [can0] on network [CAN1]
+    [date time] [SilKitAdapterVcan] [info] vcan device [can0] successfully opened
+    [date time] [SilKitAdapterVcan] [info] Created CAN device connector for [can0] on network [CAN1]
 
 
-You should also see a `SilKitAdapterSocketCAN` participant announcement in the SIL Kit registry terminal
+You should also see a `SilKitAdapterVcan` participant announcement in the SIL Kit registry terminal
 
-    [date time] [SilKitRegistry] [info] Sending known participant message to SilKitAdapterSocketCAN, protocol version 3.1
+    [date time] [SilKitRegistry] [info] Sending known participant message to SilKitAdapterVcan, protocol version 3.1
 
-When the previous steps are done, your set up looks like the following and the SIL Kit vCAN Adapter is connected on the SIL Kit `CAN1` network:
+When the previous steps are done, your set up looks like the following and the SIL Kit Adapter vcan is connected on the SIL Kit `CAN1` network:
 
     +------------------------------------------------------------------------+
     |Linux Host                                                . . . . . . . |
     |                                       +------------+     .           . | 
     |                                       |   SIL Kit  |     .  SIL Kit  . |
-    | +-------------------------------+     |    vCAN    <----->   CAN1    . |
+    | +-------------------------------+     |    vcan    <----->   CAN1    . |
     | |QEMU Image                     |     |   Adapter  |     .  network  . |
     | |                               |     +------ʌ-----+     .           . |
     | |                               |            |           . . . . . . . |
     | |                               |            |                         |    
     | |          +--------------+-----+----+-------v-----+                   |
     | |          |              |   QEMU   |             |                   |
-    | |          |  CAN device  |SocketCAN | vCAN device |                   |
+    | |          |  CAN device  |SocketCAN | vcan device |                   |
     | |          |     can0     |Interface |    can0     |                   |
     | |          +--------------+-----+----+-------------+                   |
     | |                               |                                      |
@@ -95,7 +95,7 @@ When the previous steps are done, your set up looks like the following and the S
     |                                                                        |
     +------------------------------------------------------------------------+
 
-At this point, if you generate some CAN frames on the `can0` CAN device from the QEMU image, these frames will propagate via the SIL Kit vCAN Adapter through to `CAN1` SIL Kit network.
+At this point, if you generate some CAN frames on the `can0` CAN device from the QEMU image, these frames will propagate via the SIL Kit Adapter vcan through to `CAN1` SIL Kit network.
 Launch the following command on the QEMU terminal to generate 300 frames:
 
 ```
@@ -104,7 +104,7 @@ cansend can0 001#AAAABBBB
 sleep 0.5
 done
 ```
-Any SIL Kit participants connected to the same SIL Kit `CAN1` network will be able to exchange CAN frames from `can0` vCAN device.   
+Any SIL Kit participants connected to the same SIL Kit `CAN1` network will be able to exchange CAN frames from `can0` vcan device.   
 
 In a separate Terminal, launch the sil-kit-demo-can-echo-device. This will connect it to SIL Kit's `CAN1` network by default.
 ```
@@ -131,8 +131,8 @@ You should also see a `CanEchoDevice` participant announcement in the SIL Kit re
 ```
 **Note:**  The CanEchoDevice is a SIL Kit participant on CAN1 network that echoes back CAN messages it receives after incrementing the received CAN ID by 1 and shifitng the data field by one byte to the left.
 
-## Monitoring CAN data generated on `can0` vCAN device  
-You can read the CAN frames that are transmitted by the QEMU image on Linux host, as they are fedthrough to the `can0` vCAN device on the host side throught the CAN Interface provided by the QEMU image. To do this you can use the following command in a Terminal on your Linux host:
+## Monitoring CAN data generated on `can0` vcan device  
+You can read the CAN frames that are transmitted by the QEMU image on Linux host, as they are fedthrough to the `can0` vcan device on the host side throught the CAN Interface provided by the QEMU image. To do this you can use the following command in a Terminal on your Linux host:
 ```
 candump can0
 ```

@@ -1,5 +1,5 @@
-Description: Configuration for Adapter participant for SIL Kit Adapter vCAN demo
-ParticipantName: SilKitAdapterSocketCAN
+Description: Configuration for Adapter participant for SIL Kit Adapter vcan demo
+ParticipantName: SilKitAdapterVcan
 CanControllers:
 - Name: SilKit_CAN_CTRL_1
   Network: CAN1

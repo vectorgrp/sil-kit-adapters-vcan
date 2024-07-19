@@ -60,7 +60,7 @@ class InvalidCli : public std::exception
 
 struct UnsupportedCANFrame : public std::runtime_error
 {
-    UnsupportedCANFrame(): std::runtime_error("CAN frame is not supported by the connected vCAN device."){}
+    UnsupportedCANFrame(): std::runtime_error("CAN frame is not supported by the connected vcan device."){}
 };
 
 struct InvalidVirtualCANDevice : public std::runtime_error

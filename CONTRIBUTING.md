@@ -1,6 +1,6 @@
-# Contributing to Vector SIL Kit Adapters for Virtual CAN
+# Contributing to Vector SIL Kit Adapter for virtual CAN
 
-Welcome and thank you for your interest in contributing to the Vector SIL Kit Adapters for Virtual CAN
+Welcome and thank you for your interest in contributing to the Vector SIL Kit Adapter for virtual CAN
 open source project.
 
 We are sorry, but at the moment, we do not accept external contributions until

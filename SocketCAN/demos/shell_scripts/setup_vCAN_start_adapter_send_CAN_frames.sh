@@ -21,13 +21,13 @@ else
   exit 1
 fi
 
-# Setup an FD-capable vCAN device (default case)
+# Setup an FD-capable vcan device (default case)
 echo "[info] Setting up [can0]..."
 $scriptDir/setup_vCAN_device.sh can0 $arg &> $logDir/setup_vCAN_device_can0$arg.out
 
 # Start adapter 
 echo "[info] Starting sil-kit-adapter-vcan..."
-$scriptDir/../../../bin/sil-kit-adapter-vcan --name SilKitAdapterSocketCAN$arg &> $logDir/sil-kit-adapter-vcan$arg.out &
+$scriptDir/../../../bin/sil-kit-adapter-vcan --name SilKitAdapterVcan$arg &> $logDir/sil-kit-adapter-vcan$arg.out &
 sleep 1 # wait 1 second for the creation/existence of the .out file
 timeout 30s grep -q 'Press CTRL + C to stop the process...' <(tail -f $logDir/sil-kit-adapter-vcan$arg.out -n +1) || { echo "[error] Timeout reached while waiting for sil-kit-adapter-vcan to start"; exit 1; }
 echo "[info] sil-kit-adapter-vcan has been started"
@@ -37,7 +37,7 @@ $scriptDir/send_CAN_frames.sh can0 &> $logDir/send_ClassicalCAN_frames.out &
 sleep 1
 timeout 30s grep -q '\{001#AA.AA.BB.BB\} sent to \[can0\]' <(tail -f $logDir/send_ClassicalCAN_frames.out -n +1) || { echo "[error] Timeout reached while waiting for (send_CAN_frames.sh can0) to start"; exit 1; }
 
-# Only send CANFD frames if vCAN device is compatible (not -mtu arg is passed to script)
+# Only send CANFD frames if vcan device is compatible (not -mtu arg is passed to script)
 if [[ -z $arg ]]; then
   echo "[info] Sending CAN FD frames on [can0]..."
   $scriptDir/send_CAN_frames.sh can0 -fd &> $logDir/send_CANFD_frames.out &

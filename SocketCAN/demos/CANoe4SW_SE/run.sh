@@ -18,14 +18,14 @@ if [[ -n "$canoe4sw_se_install_dir" ]]; then
 	#run tests
   if [ $# -gt 0 ]; then # Check if an argument is passed
     if [ "$1" == "-mtu16" ]; then # Check if the passed argument equals '-mtu16'
-      echo "Running tests for MTU 16 vCAN devices."
+      echo "Running tests for MTU 16 vcan devices."
       $canoe4sw_se_install_dir/canoe4sw-se "$script_root/Default.venvironment" -d "$script_root/working-dir" --verbosity-level "2" --test-unit "$script_root/test_CAN_EchoDevice.vtestunit"  --show-progress "tree-element"
     else
       echo "[Error] Unknown argument has been passed to run.sh script, terminating."
       exit_status=1
     fi
   else
-    echo "Running tests for MTU 72 vCAN devices."
+    echo "Running tests for MTU 72 vcan devices."
     $canoe4sw_se_install_dir/canoe4sw-se "$script_root/Default.venvironment" -d "$script_root/working-dir" --verbosity-level "2" --test-unit "$script_root/test_CANFD_EchoDevice.vtestunit"  --show-progress "tree-element"
   fi
 

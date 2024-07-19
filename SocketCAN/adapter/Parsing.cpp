@@ -50,16 +50,16 @@ bool adapters::thereAreUnknownArguments(int argc, char** argv)
 void adapters::print_help(bool userRequested)
 {
     std::cout << "Usage (defaults in curly braces if you omit the switch):" << std::endl;
-    std::cout << "sil-kit-adapter-vcan ["<<participantNameArg<<" <participant name{SocketCAN_silkit}>]\n"
+    std::cout << "sil-kit-adapter-vcan ["<<participantNameArg<<" <participant name{SilKitAdapterVcan}>]\n"
         "  [" << configurationArg << " <path to .silkit.yaml or .json configuration file>]\n"
         "  ["<<regUriArg<<" silkit://<host{localhost}>:<port{8501}>]\n"
         "  ["<<logLevelArg<<" <Trace|Debug|Warn|{Info}|Error|Critical|Off>]\n"
-        "  ["<<canNameArg<<" <vCAN device name{can0}>]\n"
+        "  ["<<canNameArg<<" <vcan device name{can0}>]\n"
         "  ["<<networkArg<<" <SIL Kit CAN network{CAN1}>]\n"
         "SIL Kit-specific CLI arguments will be overwritten by the config file passed by " << configurationArg << ".\n";
     std::cout << "\n"
         "Example:\n"
-        "sil-kit-adapter-vcan "<<participantNameArg<<" vCAN_PARTICIPANT " <<  networkArg<<" CAN_NETWORK\n";
+        "sil-kit-adapter-vcan "<<participantNameArg<<" VCAN_PARTICIPANT " <<  networkArg<<" CAN_NETWORK\n";
   
     if (!userRequested)
         std::cout << "\n"

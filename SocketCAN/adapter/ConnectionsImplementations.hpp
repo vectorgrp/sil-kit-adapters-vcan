@@ -43,7 +43,7 @@ struct ICanConnectionImpl
     virtual asio::mutable_buffer GetBuffer() = 0;
     // Writes the SIL Kit CanFrame to the stream_descriptor
     virtual void WriteToStream(asio::posix::stream_descriptor* stream, const CanFrame& SilkitFrame) = 0;
-    // A function that is used as a callback that handles received frames from the vCAN device, sending them on the SIL Kit network
+    // A function that is used as a callback that handles received frames from the vcan device, sending them on the SIL Kit network
     void HandleReceivedCanFrameFromVirtualCanDevice(ICanController* canController, SilKit::Services::Logging::ILogger* logger);
 
 protected:

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(VectorSilKitAdaptersVCan)
+project(VectorSilKitAdapterVcan)
 include(FetchContent)
 
 set(CMAKE_BUILD_RPATH_USE_ORIGIN ON)
@@ -8,8 +8,8 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(CMAKE_CXX_STANDARD 17)
 
-set(SILKIT_ADAPTERS_VCAN_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin")
-set(SILKIT_ADAPTERS_VCAN_LIBRARY_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/lib")
+set(SILKIT_ADAPTER_VCAN_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin")
+set(SILKIT_ADAPTER_VCAN_LIBRARY_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/lib")
 
 set(SILKIT_VERSION "4.0.50" CACHE STRING "If no SIL Kit package is specified, this version will be downloaded")
 set(SILKIT_FLAVOR "ubuntu-18.04-x86_64-gcc" CACHE STRING "If no SIL Kit package is specified, this package flavor will be downloaded")
@@ -137,7 +137,7 @@ include(GNUInstallDirs)
 
 install(
     FILES 
-        ${SILKIT_ADAPTERS_VCAN_LIBRARY_DIRECTORY}/libSilKit.so                
+        ${SILKIT_ADAPTER_VCAN_LIBRARY_DIRECTORY}/libSilKit.so                
     DESTINATION ${CMAKE_INSTALL_LIBDIR}
     PERMISSIONS
         OWNER_READ OWNER_WRITE
@@ -177,8 +177,8 @@ install(
 
 set(CPACK_GENERATOR "ZIP")
 
-set(CPACK_PACKAGE_DESCRIPTION "binary release of SIL Kit Adapters vCAN")
-set(CPACK_PACKAGE_NAME "SilKit-Adapters-vCAN")
+set(CPACK_PACKAGE_DESCRIPTION "binary release of SIL Kit Adapter vcan")
+set(CPACK_PACKAGE_NAME "SilKit-Adapter-vcan")
 set(CPACK_PACKAGE_VENDOR "Vector Informatik")
 set(CPACK_PACKAGE_CONTACT "support@vector.com")
 set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}${PACKAGE_FILENAME_SUFFIX}")

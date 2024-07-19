@@ -1,4 +1,4 @@
-# Vector SIL Kit Adapter for SocketCAN (Linux only)
+# Vector SIL Kit Adapter for virtual CAN (Linux only)
 This collection of software is provided to illustrate how the [Vector SIL Kit](https://github.com/vectorgrp/sil-kit/)
 can be attached to a virtual CAN (Controller Area Network) interface [SocketCAN](https://docs.kernel.org/networking/can.html) running in Linux kernel.
 
@@ -12,7 +12,7 @@ shell.
 
 **Note:** WSL/WSL2 are excluded from this context as their standard kernels don't support SocketCAN.   
 
-## a) Getting Started with self-build Adapter and Demos
+## a) Getting Started with self-built Adapter and Demos
 
 This section specifies steps you should do if you have just cloned the repository.
 
@@ -33,7 +33,7 @@ Otherwise clone the standalone version of asio manually:
 ### Build the Adapter
 To build the adapter, you'll need an ubuntu SIL Kit package ``SilKit-x.y.z-$ubuntu``. You can download it directly from [Vector SIL Kit Releases](https://github.com/vectorgrp/sil-kit/releases). The easiest way would be to download it with your web browser, unzip it and place it on your file system, where it also can be accessed by ``bash``.
 
-The adapters and demos are built using ``cmake``:
+The adapter and demos are built using ``cmake``:
 
     mkdir build
     cmake -S. -Bbuild -DSILKIT_PACKAGE_DIR=/path/to/SilKit-x.y.z-$ubuntu/ -D CMAKE_BUILD_TYPE=Release
@@ -46,16 +46,16 @@ The adapters and demos are built using ``cmake``:
 **Note 3:** If you don't provide a specific path for SILKIT_PACKAGE_DIR and there is no SIL Kit installation on your system, a SIL Kit release package (the default version listed in CMakeLists.txt) will be fetched from github.com and the adapter will be built against it.
 
 
-The adapters and demo executables will be available in the ``bin`` directory.
+The adapter and demo executables will be available in the ``bin`` directory.
 Additionally the ``SilKit`` shared library is copied to the ``lib`` directory next to it automatically.
 
 ## b) Getting Started with pre-built Adapter and Demos
-Download a preview or a release of the Adapter directly from [Vector SIL Kit Adapters Releases](https://github.com/vectorgrp/sil-kit-adapters-vcan/releases).
+Download a preview or a release of the adapter directly from [Vector SIL Kit Adapter for virtual CAN Releases](https://github.com/vectorgrp/sil-kit-adapters-vcan/releases).
 
 You should also download a SIL Kit Release directly from [Vector SIL Kit Releases](https://github.com/vectorgrp/sil-kit/releases). You will need this for being able to start a sil-kit-registry.
 
 ## Install the sil-kit-adapter-vcan (optional)
-If you call the following command (can be done for self build and pre build package after cmake configure) ``sil-kit-adapter-vcan`` can be called from everywhere without defining a path:  
+If you call the following command (can be done for self-built and pre-built package after cmake configure) ``sil-kit-adapter-vcan`` can be called from everywhere without defining a path:  
 
     sudo cmake --build build --target install
 
@@ -81,13 +81,13 @@ Now you can run the adapter from terminal.
 
 The application *optionally* takes the following command line arguments:
 
-    ./bin/sil-kit-adapter-vcan [--name <participant name{SilKitAdapterSocketCAN}>]
-                                 [--configuration <path to .silkit.yaml or .json configuration file>]
-                                 [--registry-uri silkit://<host{localhost}>:<port{8501}>]
-                                 [--log <Trace|Debug|Warn|{Info}|Error|Critical|Off>]
-                                 [--can-name <vCAN device name{can0}>]
-                                 [--network <SIL Kit CAN network{CAN1}>]
-                                 [--help]
+    sil-kit-adapter-vcan [--name <participant name{SilKitAdapterVcan}>]
+        [--configuration <path to .silkit.yaml or .json configuration file>]
+        [--registry-uri silkit://<host{localhost}>:<port{8501}>]
+        [--log <Trace|Debug|Warn|{Info}|Error|Critical|Off>]
+        [--can-name <vcan device name{can0}>]
+        [--network <SIL Kit CAN network{CAN1}>]
+        [--help]
 **Note:** SIL Kit-specific CLI arguments will be overwritten by the config file specified by ``--configuration``.
 
 ## SocketCAN Demo
