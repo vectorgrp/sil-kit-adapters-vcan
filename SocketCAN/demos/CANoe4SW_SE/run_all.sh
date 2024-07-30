@@ -35,10 +35,10 @@ sleep 1 # wait 1 second for the creation of the .out file
 timeout 30s grep -q 'Press CTRL + C to stop the process...' <(tail -f $logDir/sil-kit-demo-can-echo-device.out -n +1) || { echo "[error] Timeout reached while waiting for sil-kit-demo-can-echo-device to start"; exit 1; }
 
 # Run and test adapter with vcan device of MTU 72
-$scriptDir/../shell_scripts/setup_vCAN_start_adapter_send_CAN_frames.sh &> $logDir/setup_vCAN_start_adapter_send_CAN_frames.out &
+$scriptDir/../shell_scripts/setup_vcan_start_adapter_send_CAN_frames.sh &> $logDir/setup_vcan_start_adapter_send_CAN_frames.out &
 script_pid=$!
 sleep 1 # wait 1 second for the creation of the .out file
-timeout 90s grep -q 'Adapter has been launched and CAN payload is being generated...' <(tail -f $logDir/setup_vCAN_start_adapter_send_CAN_frames.out -n +1) || { echo "[error] Timeout reached while waiting for (setup_vCAN_start_adapter_send_CAN_frames.sh) to start"; exit 1; }
+timeout 90s grep -q 'Adapter has been launched and CAN payload is being generated...' <(tail -f $logDir/setup_vcan_start_adapter_send_CAN_frames.out -n +1) || { echo "[error] Timeout reached while waiting for (setup_vcan_start_adapter_send_CAN_frames.sh) to start"; exit 1; }
 
 $scriptDir/run.sh
 exit_status=$?
@@ -50,9 +50,9 @@ fi
 kill $script_pid
 
 # Run and test adapter with vcan device of MTU 16
-$scriptDir/../shell_scripts/setup_vCAN_start_adapter_send_CAN_frames.sh -mtu16 &> $logDir/setup_vCAN_start_adapter_send_CAN_frames-mtu16.out &
+$scriptDir/../shell_scripts/setup_vcan_start_adapter_send_CAN_frames.sh -mtu16 &> $logDir/setup_vcan_start_adapter_send_CAN_frames-mtu16.out &
 sleep 1 # wait 1 second for the creation of the .out file
-timeout 60s grep -q 'Adapter has been launched and CAN payload is being generated...' <(tail -f $logDir/setup_vCAN_start_adapter_send_CAN_frames-mtu16.out -n +1) || { echo "[error] Timeout reached while waiting for (setup_vCAN_start_adapter_send_CAN_frames.sh -mtu16) to start"; exit 1; }
+timeout 60s grep -q 'Adapter has been launched and CAN payload is being generated...' <(tail -f $logDir/setup_vcan_start_adapter_send_CAN_frames-mtu16.out -n +1) || { echo "[error] Timeout reached while waiting for (setup_vcan_start_adapter_send_CAN_frames.sh -mtu16) to start"; exit 1; }
 
 $scriptDir/run.sh -mtu16
 exit_status=$?
@@ -60,18 +60,6 @@ exit_status=$?
 if [[ exit_status -ne 0 ]]; then
   exit $exit_status
 fi
-
-echo "sil-kit-registry.out:--------------------------------------------------------------------------------------" 
-cat $logDir/sil-kit-registry.out
-echo "-----------------------------------------------------------------------------------------------------------" 
-
-echo "setup_vCAN_start_adapter_send_CAN_frames.out:--------------------------------------------------------------" 
-cat $logDir/setup_vCAN_start_adapter_send_CAN_frames.out
-echo "-----------------------------------------------------------------------------------------------------------" 
-
-echo "setup_vCAN_start_adapter_send_CAN_frames-mtu16.out:--------------------------------------------------------"
-cat $logDir/setup_vCAN_start_adapter_send_CAN_frames-mtu16.out
-echo "-----------------------------------------------------------------------------------------------------------"
 
 #exit run_all.sh with same exit_status
 exit $exit_status

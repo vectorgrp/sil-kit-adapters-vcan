@@ -23,7 +23,7 @@ fi
 
 # Setup an FD-capable vcan device (default case)
 echo "[info] Setting up [can0]..."
-$scriptDir/setup_vCAN_device.sh can0 $arg &> $logDir/setup_vCAN_device_can0$arg.out
+$scriptDir/setup_vcan_device.sh can0 $arg &> $logDir/setup_vcan_device_can0$arg.out
 
 # Start adapter 
 echo "[info] Starting sil-kit-adapter-vcan..."

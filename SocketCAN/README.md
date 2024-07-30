@@ -36,7 +36,7 @@ participants in order to exchange CAN frames. The `sil-kit-demo-can-echo-device`
 ## SocketCAN interface setup and CAN traffic generation in Linux
 First, run the following command in the Terminal to load the necessary Linux kernel modules and setup a virtual CAN interface named `can0`.
 
-    sudo ./SocketCAN/demos/shell_scripts/setup_vCAN_device.sh can0
+    sudo ./SocketCAN/demos/shell_scripts/setup_vcan_device.sh can0
 
 You should see this output that indicates that the `can0` virtual CAN device has been successfully launched:
     
@@ -162,7 +162,7 @@ Before you can connect CANoe to the SIL Kit network you should adapt the `Regist
 The configuration file is referenced by both following CANoe use cases (Desktop Edition and Server Edition).
 
 #### CANoe Desktop Edition
-Load the `CANoe_vCAN_configuration.cfg` from the `demos/CANoe` directory and start the measurement. Optionally you can also start the test unit execution of the `CAN_and_CAN_FD` test configuration.
+Load the `CANoe_vcan_configuration.cfg` from the `demos/CANoe` directory and start the measurement. Optionally you can also start the test unit execution of the `CAN_and_CAN_FD` test configuration.
 
 While the demo is running these tests should be successful.
 

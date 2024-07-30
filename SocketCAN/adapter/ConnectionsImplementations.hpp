@@ -20,14 +20,14 @@
 
 using namespace SilKit::Services::Can;
 
-enum vCANDeviceType
+enum CanDeviceType
 {
     CLASSICAL_CAN_DEVICE,
     CAN_FD_DEVICE,
     INVALID_DEVICE
 };
 
-enum canFrameType
+enum CanFrameType
 {
     PURE_FD_FRAME,
     FD_CLASSIC_FRAME,
@@ -47,7 +47,7 @@ struct ICanConnectionImpl
     void HandleReceivedCanFrameFromVirtualCanDevice(ICanController* canController, SilKit::Services::Logging::ILogger* logger);
 
 protected:
-    canFrameType _frameType;
+    CanFrameType _frameType;
 };
 
 struct ClassicalCanConnectionImpl : public ICanConnectionImpl

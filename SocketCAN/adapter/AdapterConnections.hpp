@@ -39,9 +39,9 @@ private:
     SilKit::Services::Logging::ILogger* _logger;
     ICanController* _silkitCtrl;
 
-    struct VCANDevice
+    struct CanDevice
     {
         int fileDescriptor;
-        vCANDeviceType deviceType;
+        CanDeviceType deviceType;
     } _vcanDevice;
 };
