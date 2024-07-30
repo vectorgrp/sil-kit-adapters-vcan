@@ -51,6 +51,8 @@ Once you are logged in to the QEMU image, configure the `can0` CAN device and se
   ip link set can0 up
 ```
 
+**Note:** Be aware that the emulated `kvaser_pci` CAN device in this demo only handles Classical CAN frames. CAN FD frames are not supported.
+
 ## Running the Demo Applications
 Now is a good point to start the `sil-kit-registry` on your Linux host:
 
