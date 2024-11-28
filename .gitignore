@@ -1,58 +1,30 @@
-# Prerequisites
-*.d
-
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
-
-# Precompiled Headers
-*.gch
-*.pch
-
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
-
-# Fortran module files
-*.mod
-*.smod
-
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
-
-# Executables
-*.exe
-*.out
-*.app
-
-# Test reports 
-*.vtestreport
-*vtestreport.rename
-
+# ignore cmake-generated path directories
+build*/
+_build*/
+install*/
+_install*/
 out/
-/out/
-/.vs/
-/.vscode/
-/build/
-/_build/
-/install/
-/_install/
-/Downloads/
-/bin/
-/lib/
-/*/build/
-/**/Default.venvironment/
-/**/*.vtestunit/
-/**/working-dir/
-/CMakeSettings.json
-/**/.run/
-*.ini
-*.settings
+bin/
+lib/
+**/Downloads/
+
+# ignore IDE directories
+.idea/
+.vs/
+.vscode/
+
+# ignore log files
+*.out
+
+# ignore Vector files
+.vector/
+
+# ignore CANoe-generated files and directories
 *.xpa
-/**/*.stcfg
+*.vtestreport
+*.stcfg
+*.ini
+**/.run/
+**/Default.venvironment/
+**/working-dir/
+**/*.vtestunit/
