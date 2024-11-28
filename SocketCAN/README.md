@@ -199,3 +199,30 @@ If both CAN FD and Classical CAN frames are being sent while the SIL Kit Adapter
 ![CANDUMP](demos/images/candump_output.png)
 
 CAN frames with ID of `007` and `009` are the ones sent from CANoe Desktop Edition and the ones with ID `008` and `00A` are the response of the sil-kit-demo-can-echo-device to those frames, after increasing their ID by 1 and applying a shift-left of data by one byte.
+
+
+## Running the demo application inside a Docker container (Optional)
+*Note: This section provides an alternative method for running the demo applications - apart from CANoe Desktop Edition and CANoe4SW Server Edition - inside a Docker container and using the `devcontainers` Visual Studio Code extension. The steps outlined here are optional and not required if you prefer to run the applications directly and manually on your host machine.*
+
+The following tools are needed:
+* Visual Studio Code in Windows
+* An Ubuntu Virtual Machine with Docker running as a daemon (WSL2 is not compatible because it does not support SocketCAN by default)
+* *ms-vscode-remote.remote-ssh* Visual Studio Code Extension
+* *ms-vscode-remote.remote-containers* Visual Studio Code Extension
+
+### Steps: 
+1- Clone the repo on your Virtual Machine (if you have not done that yet).
+
+2- Open the cloned folder remotely from an instance of Visual Studio Code via SSH (using the *ms-vscode-remote.remote-ssh* Visual Studio Code Extension).
+
+3- A pop-up will appear and propose to open the project in a container.
+
+![Dev Containers popup](demos/images/dev_container_popup.png)
+
+Alternatively, you can click on the Dev Containers button at the bottom-left corner of  Visual Studio Code, then click on `Reopen in Container`. 
+
+Wait for the Docker image to be built and for the container to start. After that, you can launch the pre-defined tasks to acheive the demo setup.
+ 
+> The Docker container exposes the TCP/IP port 8501 to the host, which means that adding CANoe as a participant in the following steps shall work out-of-the box if you set SIL Kit's registry-uri to `silkit://localhost:8501`.   
+
+**Note:** Be aware that following the previously mentioned steps will build a Docker image and run a Docker container on your system. Make sure you stop the Docker container and clean up any dangling Docker images afterwards.  

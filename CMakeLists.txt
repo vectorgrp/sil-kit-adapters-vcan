@@ -106,6 +106,20 @@ install(
     COMPONENT source
     EXCLUDE_FROM_ALL
 )
+install(
+    FILES
+        ${CMAKE_CURRENT_SOURCE_DIR}/SocketCAN/demos/shell_scripts/tasks_scripts/build_adapter.sh
+        ${CMAKE_CURRENT_SOURCE_DIR}/SocketCAN/demos/shell_scripts/tasks_scripts/prepare_run_silkit.sh
+        ${CMAKE_CURRENT_SOURCE_DIR}/SocketCAN/demos/shell_scripts/tasks_scripts/run_EchoDevice.sh
+        ${CMAKE_CURRENT_SOURCE_DIR}/SocketCAN/demos/shell_scripts/tasks_scripts/stop_processes.sh
+    DESTINATION SocketCAN/demos/shell_scripts/tasks_scripts
+    PERMISSIONS
+        OWNER_READ OWNER_WRITE OWNER_EXECUTE
+        GROUP_READ GROUP_EXECUTE
+        WORLD_READ WORLD_EXECUTE
+    COMPONENT source
+    EXCLUDE_FROM_ALL
+)
 
 install(
     FILES            

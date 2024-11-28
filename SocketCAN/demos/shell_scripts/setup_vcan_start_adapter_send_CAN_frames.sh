@@ -46,4 +46,4 @@ if [[ -z $arg ]]; then
 fi
 
 echo "[info] Adapter has been launched and CAN payload is being generated..."
-sleep 15
+sleep 45
