@@ -20,6 +20,13 @@ target_include_directories(asio INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/third_part
 target_compile_definitions(asio INTERFACE ASIO_STANDALONE=1)
 target_link_libraries(asio INTERFACE Threads::Threads)
 
+# Set SIL Kit lib name
+if(CMAKE_BUILD_TYPE STREQUAL "Release")
+    set(SILKIT_SO_NAME "SilKit.so")
+else() # Debug or RelWithDebInfo
+    set(SILKIT_SO_NAME "SilKitd.so")
+endif()
+
 if(DEFINED SILKIT_PACKAGE_DIR)    
 # if the user forces using a specific SIL Kit package, use it
     message(STATUS "SILKIT_PACKAGE_DIR has been set to: ${SILKIT_PACKAGE_DIR}, CMAKE will look for a SIL Kit package in that directory")
@@ -151,7 +158,7 @@ include(GNUInstallDirs)
 
 install(
     FILES 
-        ${SILKIT_ADAPTER_VCAN_LIBRARY_DIRECTORY}/libSilKit.so                
+        ${SILKIT_ADAPTER_VCAN_LIBRARY_DIRECTORY}/${SILKIT_SO_NAME}
     DESTINATION ${CMAKE_INSTALL_LIBDIR}
     PERMISSIONS
         OWNER_READ OWNER_WRITE

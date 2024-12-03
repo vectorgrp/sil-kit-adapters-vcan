@@ -25,6 +25,6 @@ add_custom_command(
     TARGET sil-kit-adapter-vcan
     POST_BUILD
     COMMAND ${CMAKE_COMMAND}
-    ARGS -E copy $<TARGET_FILE:SilKit::SilKit> ${SILKIT_ADAPTER_VCAN_LIBRARY_DIRECTORY}/libSilKit.so
+    ARGS -E copy $<TARGET_FILE:SilKit::SilKit> ${SILKIT_ADAPTER_VCAN_LIBRARY_DIRECTORY}/${SILKIT_SO_NAME}
 )
 
