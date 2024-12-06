@@ -92,7 +92,9 @@ add_subdirectory(SocketCAN/demos)
 install(
     DIRECTORY            
         ${CMAKE_CURRENT_SOURCE_DIR}/SocketCAN
-        ${CMAKE_CURRENT_SOURCE_DIR}/third_party        
+        ${CMAKE_CURRENT_SOURCE_DIR}/third_party
+        ${CMAKE_CURRENT_SOURCE_DIR}/.devcontainer
+        ${CMAKE_CURRENT_SOURCE_DIR}/.vscode
     DESTINATION .
     COMPONENT source
     EXCLUDE_FROM_ALL   
