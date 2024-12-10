@@ -22,9 +22,9 @@ target_link_libraries(asio INTERFACE Threads::Threads)
 
 # Set SIL Kit lib name
 if(CMAKE_BUILD_TYPE STREQUAL "Release")
-    set(SILKIT_SO_NAME "SilKit.so")
+    set(SILKIT_SO_NAME "libSilKit.so")
 else() # Debug or RelWithDebInfo
-    set(SILKIT_SO_NAME "SilKitd.so")
+    set(SILKIT_SO_NAME "libSilKitd.so")
 endif()
 
 if(DEFINED SILKIT_PACKAGE_DIR)    
