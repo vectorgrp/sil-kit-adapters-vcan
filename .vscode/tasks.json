@@ -20,8 +20,7 @@
             "options": {
                 "cwd": "${workspaceFolder}"
             },
-            "problemMatcher": [
-            ]
+
         },
         {
             "label": "3-Start sil-kit-demo-can-echo-device",
@@ -32,8 +31,7 @@
             "options": {
                 "cwd": "${workspaceFolder}"
             },
-            "problemMatcher": [
-            ]
+
         },
         {
             "label": "4-Start Adapter and send frames",
@@ -44,18 +42,27 @@
             "options": {
                 "cwd": "${workspaceFolder}"
             },
-            "problemMatcher": [
-            ]
         },
         {
-            "label": "5-Stop processes",
+            "label": "5-Visualise CAN traffic",
+            "command": "/bin/bash",
+            "args": [
+                "SocketCAN/demos/shell_scripts/tasks_scripts/traffic_monitoring.sh"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+        },
+        {
+            "label": "6-Stop processes",
             "command": "/bin/bash",
             "args": [
                 "SocketCAN/demos/shell_scripts/tasks_scripts/stop_processes.sh"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
-            }
+            },
+            
         }
     ]
 }

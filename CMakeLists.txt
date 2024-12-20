@@ -121,6 +121,7 @@ install(
         ${CMAKE_CURRENT_SOURCE_DIR}/SocketCAN/demos/shell_scripts/tasks_scripts/prepare_run_silkit.sh
         ${CMAKE_CURRENT_SOURCE_DIR}/SocketCAN/demos/shell_scripts/tasks_scripts/run_EchoDevice.sh
         ${CMAKE_CURRENT_SOURCE_DIR}/SocketCAN/demos/shell_scripts/tasks_scripts/stop_processes.sh
+        ${CMAKE_CURRENT_SOURCE_DIR}/SocketCAN/demos/shell_scripts/tasks_scripts/traffic_monitoring.sh
     DESTINATION SocketCAN/demos/shell_scripts/tasks_scripts
     PERMISSIONS
         OWNER_READ OWNER_WRITE OWNER_EXECUTE
