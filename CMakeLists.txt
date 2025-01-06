@@ -132,6 +132,19 @@ install(
 )
 
 install(
+    FILES
+        ${CMAKE_CURRENT_SOURCE_DIR}/SocketCAN/demos/shell_scripts/Cuttlefish/prepare_cuttlefish_vcan_device.sh
+        ${CMAKE_CURRENT_SOURCE_DIR}/SocketCAN/demos/shell_scripts/Cuttlefish/send_CAN_frames.sh
+    DESTINATION SocketCAN/demos/shell_scripts/Cuttlefish
+    PERMISSIONS
+        OWNER_READ OWNER_WRITE OWNER_EXECUTE
+        GROUP_READ GROUP_EXECUTE
+        WORLD_READ WORLD_EXECUTE
+    COMPONENT source
+    EXCLUDE_FROM_ALL
+)
+
+install(
     FILES            
         ${CMAKE_CURRENT_SOURCE_DIR}/SocketCAN/demos/CANoe4SW_SE/run.sh
         ${CMAKE_CURRENT_SOURCE_DIR}/SocketCAN/demos/CANoe4SW_SE/run_all.sh

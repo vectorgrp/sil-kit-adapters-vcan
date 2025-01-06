@@ -108,7 +108,7 @@ void CanConnection::InitialiseVirtualCANConnection(const char* canDeviceName)
     socketAddress.can_ifindex = ifr.ifr_ifindex;
 
     // Bind socket (link socketCAN File Descriptor to address)
-    errorCode = bind(_vcanDevice.fileDescriptor, (struct sockaddr*)&socketAddress, sizeof(socketAddress));
+    errorCode = ::bind(_vcanDevice.fileDescriptor, (struct sockaddr*)&socketAddress, sizeof(socketAddress));
     if (errorCode < 0)
     {
         int bindErrorCode = errno; // Capture the error code

@@ -17,7 +17,7 @@ fi
 if [[ $1 == "-mtu16" || -z $1 ]]; then
   arg=$1
 else
-  echo "[Error] Invalid argument. Use -mtu16 to set the MTU to 16."
+  echo "[error] Invalid argument. Use -mtu16 to set the MTU to 16."
   exit 1
 fi
 

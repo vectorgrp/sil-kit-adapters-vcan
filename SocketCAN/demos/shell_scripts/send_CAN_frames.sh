@@ -2,7 +2,7 @@
 
 # Check if the can_device argument is provided
 if [[ -z $1 ]]; then
-    echo "Error: CAN device name must be provided."
+    echo "[error] CAN device name must be provided."
     exit 1
 fi
 can_device=$1

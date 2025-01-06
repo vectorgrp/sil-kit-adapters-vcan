@@ -45,9 +45,26 @@ The adapter and demos are built using ``cmake``:
 
 **Note 3:** If you don't provide a specific path for SILKIT_PACKAGE_DIR and there is no SIL Kit installation on your system, a SIL Kit release package (the default version listed in CMakeLists.txt) will be fetched from github.com and the adapter will be built against it.
 
-
 The adapter and demo executables will be available in the ``bin`` directory.
 Additionally the ``SilKit`` shared library is copied to the ``lib`` directory next to it automatically.
+
+### Build the adapter for Android environments 
+You can use the [Android NDK](https://developer.android.com/ndk) to cross-build the adapter for Android environments. 
+
+Begin by cloning the SIL Kit repo and building SIL Kit using the cmake toolchain file provided by Android NDK and generating a package as follows: 
+
+    cmake -S. -Bbuild -DCMAKE_TOOLCHAIN_FILE=/path/to/android-ndk/build/cmake/android.toolchain.cmake -DANDROID_ABI=x86_64 -DSILKIT_HOST_PLATFORM=android -DANDROID_PLATFORM=android-33 -DSILKIT_BUILD_TESTS=OFF -DSILKIT_BUILD_DEMOS=OFF
+
+    cmake --build build --parallel --target package
+
+Unzip the package that was generated and use the same toolchain file to cross-build the adapter, ensuring it is built against the unzipped package. 
+
+    cmake -S.  -Bbuild -DCMAKE_TOOLCHAIN_FILE=/path/to/android-ndk/build/cmake/android.toolchain.cmake  -DANDROID_ABI=x86_64 -DCMAKE_BUILD_TYPE=Release -DSILKIT_HOST_PLATFORM=android  -DSILKIT_PACKAGE_DIR=/path/to/SilKit-*-Linux-x86_64-clang-Release/  -DSilKit_DIR=/path/to/SilKit-*-Linux-x86_64-clang-Release/lib/cmake/SilKit -DANDROID_PLATFORM=android-33
+
+    cmake --build build --parallel
+
+
+Lastly, update the LD_LIBRARY_PATH in your Android environment to point to the location of the SIL Kit shared library, which can be found in the generated lib folder.
 
 ## b) Getting Started with pre-built Adapter and Demos
 Download a preview or a release of the adapter directly from [Vector SIL Kit Adapter for virtual CAN Releases](https://github.com/vectorgrp/sil-kit-adapters-vcan/releases).

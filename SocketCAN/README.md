@@ -62,6 +62,8 @@ Run the send_CAN_frames.sh script with `can0` argument to continuously generate 
 
 > You can generate CAN FD traffic by adding the `-fd` flag to the script call.
 
+> For Android environments, you will have to cross-build [`can-utils`](https://github.com/linux-can/can-utils) from scratch using [Android NDK](https://developer.android.com/ndk). Some helper scripts are provided in `SocketCAN/demos/shell_scripts/Cuttlefish/` to help you set up a demo inside an Android environment. In order to make use of the helper scripts, you have to export a `CAN_UTILS_BUILD_PATH` variable setting it to the directory of the cross-built `can-utils` binaries (inside your Android environment). 
+
 For this demo purposes, generate some CAN FD traffic on the same vcan device as follows: 
 
     ./SocketCAN/demos/shell_scripts/send_CAN_frames.sh can0 -fd
