@@ -209,14 +209,12 @@ install(
 )
 
 if (DEFINED CMAKE_INSTALL_MANDIR)
-    if (UNIX)
-        install(
-            FILES
-                ${CMAKE_CURRENT_SOURCE_DIR}/docs/man/sil-kit-adapter-vcan.1
-            DESTINATION ${CMAKE_INSTALL_MANDIR}/man1/
-            COMPONENT docs
-        )
-    endif()
+    install(
+        FILES
+	    ${CMAKE_CURRENT_SOURCE_DIR}/docs/man/sil-kit-adapter-vcan.1
+        DESTINATION ${CMAKE_INSTALL_MANDIR}/man1/
+        COMPONENT docs
+    )
 endif()
 
 ###############################################################################
