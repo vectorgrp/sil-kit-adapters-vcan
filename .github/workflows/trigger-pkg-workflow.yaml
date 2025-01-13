@@ -19,7 +19,7 @@ jobs:
     needs: get-tag-name
     uses: vectorgrp/sil-kit-adapters-pkg/.github/workflows/package-debian.yml@main
     with:
-      adapter_name: tap
+      adapter_name: vcan
       tag_name: ${{ needs.get-tag-name.outputs.tag_name }}
     secrets: inherit
   handle-artifacts:
