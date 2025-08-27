@@ -2,158 +2,124 @@
 #include <iostream>
 #include <unistd.h>
 
-#include "Exceptions.hpp"
-#include "Parsing.hpp"
-#include "SignalHandler.hpp"
+#include "common/Parsing.hpp"
+
 #include "AdapterConnections.hpp"
 #include "SilKitAdapterSocketCAN.hpp"
 
-#include "asio/ts/io_context.hpp"
-#include "silkit/SilKit.hpp"
-#include "silkit/config/all.hpp"
-#include "silkit/services/can/all.hpp"
+#include "common/ParticipantCreation.hpp"
+#include "common/Cli.hpp"
 
 using namespace std;
 using namespace SilKit::Services::Can;
-using namespace exceptions;
 using namespace adapters;
+using namespace util;
 using namespace SilKit::Services::Orchestration;
 
+const std::string adapters::canNameArg = "--can-name";
+const std::string adapters::networkArg = "--network";
+
+void print_help(bool userRequested)
+{
+    std::cout << "Usage (defaults in curly braces if you omit the switch):" << std::endl;
+    std::cout << "sil-kit-adapter-vcan [" << participantNameArg
+              << " <participant name{SilKitAdapterVcan}>]\n"
+                 "  ["
+              << configurationArg
+              << " <path to .silkit.yaml or .json configuration file>]\n"
+                 "  ["
+              << regUriArg
+              << " silkit://<host{localhost}>:<port{8501}>]\n"
+                 "  ["
+              << logLevelArg
+              << " <Trace|Debug|Warn|{Info}|Error|Critical|Off>]\n"
+                 "  ["
+              << canNameArg
+              << " <vcan device name{can0}>]\n"
+                 "  ["
+              << networkArg
+              << " <SIL Kit CAN network{CAN1}>]\n"
+                 "SIL Kit-specific CLI arguments will be overwritten by the config file passed by "
+              << configurationArg << ".\n";
+    std::cout << "\n"
+                 "Example:\n"
+                 "sil-kit-adapter-vcan "
+              << participantNameArg << " VCAN_PARTICIPANT " << networkArg << " CAN_NETWORK\n";
+
+    if (!userRequested)
+        std::cout << "\n"
+                     "Pass "
+                  << helpArg << " to get this message.\n";
+};
 
 int main(int argc, char** argv)
 {
-    if (findArg(argc, argv, helpArg, argv) != NULL)
+    if (findArg(argc, argv, helpArg, argv) != nullptr)
     {
         print_help(true);
-        return NO_ERROR;
+        return CodeSuccess;
     }
 
-    const std::string configurationFile = getArgDefault(argc, argv, configurationArg, "");
-    const std::string registryURI = getArgDefault(argc, argv, regUriArg, "silkit://localhost:8501");
-    const std::string participantName = getArgDefault(argc, argv, participantNameArg, "SilKitAdapterVcan");
-
-    const std::string canDevName = getArgDefault(argc, argv, canNameArg, "can0");
-    const std::string canNetworkName = getArgDefault(argc, argv, networkArg, "CAN1");
+    const std::string defaultParticipantName = "SilKitAdapterVcan";
+    std::string participantName = defaultParticipantName;
 
     asio::io_context io_context;
 
     try
     {
-        throwInvalidCliIf(thereAreUnknownArguments(argc, argv));
+        throwInvalidCliIf(thereAreUnknownArguments(
+            argc, argv, {&networkArg, &canNameArg, &regUriArg, &logLevelArg, &participantNameArg, &configurationArg},
+            {&helpArg}));
 
-        std::shared_ptr<SilKit::Config::IParticipantConfiguration> participantConfiguration;
+        const std::string canDevName = getArgDefault(argc, argv, canNameArg, "can0");
+        const std::string canNetworkName = getArgDefault(argc, argv, networkArg, "CAN1");
 
-        if (!configurationFile.empty())
-        {
-            participantConfiguration = SilKit::Config::ParticipantConfigurationFromFile(configurationFile);
-
-            static const auto conflictualArguments = {
-                &logLevelArg,
-                /* others are correctly handled by SilKit if one is overwritten.*/};
-
-            for (const auto* conflictualArgument : conflictualArguments)
-            {
-                if (findArg(argc, argv, *conflictualArgument, argv) != NULL)
-                {
-                    auto configFileName = configurationFile;
-                    if (configurationFile.find_last_of("/\\") != std::string::npos)
-                    {
-                        configFileName = configurationFile.substr(configurationFile.find_last_of("/\\") + 1);
-                    }
-                    std::cout << "[info] Be aware that argument given with " << *conflictualArgument
-                              << " can be overwritten by a different value defined in the given configuration file "
-                              << configFileName << std::endl;
-                }
-            }
-        }
-        else
-        {
-            const std::string loglevel = getArgDefault(argc, argv, logLevelArg, "Info");
-            const std::string participantConfigurationString =
-                R"({ "Logging": { "Sinks": [ { "Type": "Stdout", "Level": ")" + loglevel + R"("} ] } })";
-            participantConfiguration = SilKit::Config::ParticipantConfigurationFromString(participantConfigurationString);
-        }
-
-        auto participant = SilKit::CreateParticipant(participantConfiguration, participantName, registryURI);
-
-        auto logger = participant->GetLogger();
-
-        auto* lifecycleService = participant->CreateLifecycleService({OperationMode::Autonomous});
-        auto* systemMonitor = participant->CreateSystemMonitor();
+        SilKit::Services::Logging::ILogger* logger;
+        SilKit::Services::Orchestration::ILifecycleService* lifecycleService;
         std::promise<void> runningStatePromise;
 
-        systemMonitor->AddParticipantStatusHandler(
-            [&runningStatePromise, participantName](const SilKit::Services::Orchestration::ParticipantStatus& status) {
-                if (participantName == status.participantName)
-                {
-                    if (status.state == SilKit::Services::Orchestration::ParticipantState::Running)
-                    {
-                        runningStatePromise.set_value();
-                    }
-                }
-            });
+        const auto participant =
+            CreateParticipant(argc, argv, logger, &participantName, &lifecycleService, &runningStatePromise);
 
         const std::string canControllerName = "SilKit_CAN_CTRL_1";
 
-        std::ostringstream SILKitInfoMessage;
-        SILKitInfoMessage << "Creating CAN controller '" << canControllerName << "'";
-        logger->Info(SILKitInfoMessage.str());
+        logger->Info("Creating CAN controller '" + canControllerName + "'");
 
         ICanController* canController = participant->CreateCanController(canControllerName, canNetworkName);
 
         auto can_connection = CanConnection::Create(io_context, canController, logger, canDevName.c_str());
         can_connection->ReceiveCanFrameFromVirtualCanDevice();
 
-        SILKitInfoMessage.str("");
-        SILKitInfoMessage << "Created CAN device connector for [" << canDevName << "]";
-        logger->Info(SILKitInfoMessage.str());
+        logger->Info("Created CAN device connector for [" + canDevName + "]");
 
         canController->Start();
 
         auto finalStateFuture = lifecycleService->StartLifecycle();
 
-        thread t([&]() -> void {
+        std::thread ioContextThread([&]() -> void {
             io_context.run();
         });
 
-        PromptForExit();
+        promptForExit();
 
-        io_context.stop();
-        t.join();
-        canController->Stop();
-
-        auto runningStateFuture = runningStatePromise.get_future();
-        auto futureStatus = runningStateFuture.wait_for(15s);
-        if (futureStatus != future_status::ready)
-        {
-            logger->Debug("Lifecycle Service Stopping: timed out while checking if the participant is currently running.");
-        }
-
-        lifecycleService->Stop("Adapter stopped by the user.");
-
-        //canController->Start();
-        auto finalState = finalStateFuture.wait_for(15s);
-        if (finalState != future_status::ready)
-        {
-            logger->Debug("Lifecycle service stopping: timed out");
-        }
+        Stop(io_context, ioContextThread, *logger, &runningStatePromise, lifecycleService, &finalStateFuture);
     }
     catch (const SilKit::ConfigurationError& error)
     {
         cerr << "Invalid configuration: " << error.what() << endl;
-        return CONFIGURATION_ERROR;
+        return CodeErrorConfiguration;
     }
     catch (const InvalidCli&)
     {
-        print_help();
+        print_help(false);
         cerr << endl << "Invalid command line arguments." << endl;
-        return CLI_ERROR;
+        return CodeErrorCli;
     }
     catch (const exception& error)
     {
         cerr << "Something went wrong: " << error.what() << endl;
-        return OTHER_ERROR;
+        return CodeErrorOther;
     }
 
-    return NO_ERROR;
+    return CodeSuccess;
 }

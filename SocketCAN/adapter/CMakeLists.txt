@@ -1,19 +1,16 @@
 add_executable(sil-kit-adapter-vcan
     "SilKitAdapterSocketCAN.cpp"
-    "Parsing.cpp"
-    "../Utility/SignalHandler.cpp"
-	"ConnectionsImplementations.cpp"
-	"AdapterConnections.cpp"
+    "ConnectionsImplementations.cpp"
+    "AdapterConnections.cpp"
 )
-target_include_directories(sil-kit-adapter-vcan
-    PRIVATE
-    "${CMAKE_SOURCE_DIR}/SocketCAN/Utility/"
-)
+
 target_link_libraries(sil-kit-adapter-vcan
     PRIVATE
     asio
+    sil-kit-adapters-common
     SilKit::SilKit
 )
+
 set_target_properties(sil-kit-adapter-vcan
     PROPERTIES
     #ensure SilKit shared libraries can be loaded
@@ -21,10 +18,8 @@ set_target_properties(sil-kit-adapter-vcan
     BUILD_RPATH "$ORIGIN"
     RUNTIME_OUTPUT_DIRECTORY $<$<BOOL:ALWAYS>:${SILKIT_ADAPTER_VCAN_OUTPUT_DIRECTORY}>
 )
-add_custom_command(
-    TARGET sil-kit-adapter-vcan
-    POST_BUILD
-    COMMAND ${CMAKE_COMMAND}
-    ARGS -E copy $<TARGET_FILE:SilKit::SilKit> ${SILKIT_ADAPTER_VCAN_LIBRARY_DIRECTORY}/${SILKIT_SO_NAME}
-)
 
+copy_sil_kit_to_bin(sil-kit-adapter-vcan 
+    ${SILKIT_ADAPTER_VCAN_OUTPUT_DIRECTORY} 
+    ${SILKIT_ADAPTER_VCAN_LIBRARY_DIRECTORY}
+)

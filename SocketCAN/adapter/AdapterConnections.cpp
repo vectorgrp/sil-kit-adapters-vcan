@@ -1,6 +1,14 @@
 // Copyright (c) Vector Informatik GmbH. All rights reserved.
 
 #include "AdapterConnections.hpp"
+#include "AdapterUtils.hpp"
+#include "ConnectionsImplementations.hpp"
+
+#include "silkit/services/can/string_utils.hpp"
+#include "silkit/services/logging/all.hpp"
+
+using namespace adapters;
+using namespace AdapterUtils;
 
 CanConnection::CanConnection(asio::io_context& io_context, ICanController* silkitCtrl, SilKit::Services::Logging::ILogger* logger, const char* canDeviceName)
     : _canDeviceStream{io_context}

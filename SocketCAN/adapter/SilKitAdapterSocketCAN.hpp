@@ -4,12 +4,14 @@
 
 namespace adapters 
 {
-    enum ReturnCode
-    {
-        NO_ERROR = 0,
-        CLI_ERROR,
-        CONFIGURATION_ERROR,
-        OTHER_ERROR,
-        FILE_DESCRIPTOR_ERROR = -1
-    };
+/// <summary>
+/// string containing the argument preceding the vcan device name.
+/// </summary>
+extern const std::string canNameArg;
+
+/// <summary>
+/// string containing the argument preceding the SIL Kit Ethernet network name.
+/// </summary>
+extern const std::string networkArg;
+
 }

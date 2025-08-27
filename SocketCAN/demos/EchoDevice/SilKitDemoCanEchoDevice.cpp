@@ -3,7 +3,6 @@
 #include <iostream>
 #include <string>
 #include <cstring>
-#include <vector>
 
 #include "silkit/SilKit.hpp"
 #include "silkit/config/all.hpp"
@@ -11,15 +10,20 @@
 #include "silkit/services/can/string_utils.hpp"
 #include "silkit/util/Span.hpp"
 
-#include "Utility/AdapterUtils.hpp"
-#include "adapter/Parsing.hpp"
-#include "Utility/SignalHandler.hpp"
-#include "adapter/SilKitAdapterSocketCAN.hpp"
+#include "common/Parsing.hpp"
+#include "common/Cli.hpp"
+#include "common/SignalHandler.hpp"
+#include "common/ParticipantCreation.hpp"
+#include "adapter/AdapterUtils.hpp"
 
 
 using namespace SilKit::Services::Can;
 using namespace adapters;
-using namespace exceptions;
+using namespace util;
+
+namespace adapters {
+const std::string networkArg = "--network";
+}
 
 
 class Device
@@ -93,31 +97,32 @@ void print_demo_help(bool userRequested)
 
 int main(int argc, char** argv)
 {
-    if (findArg(argc, argv, "--help", argv) != nullptr)
+    if (findArg(argc, argv, helpArg, argv) != nullptr)
     {
         print_demo_help(true);
-        return NO_ERROR;
+        return CodeSuccess;
     }
-
-    const std::string loglevel = getArgDefault(argc, argv, logLevelArg, "Info");
-    const std::string participantName = getArgDefault(argc, argv, participantNameArg, "CanEchoDevice");
-    const std::string registryURI = getArgDefault(argc, argv, regUriArg, "silkit://localhost:8501");
-    const std::string canNetworkName = getArgDefault(argc, argv, networkArg, "CAN1");
-
-    const std::string canControllerName = participantName + "_CAN1";
-    const std::string participantConfigurationString = R"({ "Logging": { "Sinks": [ { "Type": "Stdout", "Level": ")" + loglevel + R"("} ] } })";
 
     try
     {
-        throwInvalidCliIf(thereAreUnknownArguments(argc, argv));
-        auto participantConfiguration = SilKit::Config::ParticipantConfigurationFromString(participantConfigurationString);
-        auto participant = SilKit::CreateParticipant(participantConfiguration, participantName, registryURI);
-        
-        auto logger = participant->GetLogger();
+        throwInvalidCliIf(thereAreUnknownArguments(
+            argc, argv, {&logLevelArg, &participantNameArg, &regUriArg, &networkArg}, {&helpArg}));
 
-        std::ostringstream SILKitInfoMessage;
-        SILKitInfoMessage << "Creating CAN controller '" << canControllerName << "'";
-        logger->Info(SILKitInfoMessage.str());
+        const std::string loglevel = getArgDefault(argc, argv, logLevelArg, "Info");
+        const std::string registryURI = getArgDefault(argc, argv, regUriArg, "silkit://localhost:8501");
+        const std::string canNetworkName = getArgDefault(argc, argv, networkArg, "CAN1");
+        std::string participantName = getArgDefault(argc, argv, participantNameArg, "CanEchoDevice");
+
+        const std::string canControllerName = participantName + "_CAN1";
+        const std::string participantConfigurationString =
+            R"({ "Logging": { "Sinks": [ { "Type": "Stdout", "Level": ")" + loglevel + R"("} ] } })";
+
+        auto participantConfiguration = SilKit::Config::ParticipantConfigurationFromString(participantConfigurationString);
+
+        SilKit::Services::Logging::ILogger* logger;
+        auto participant = CreateParticipant(argc, argv, logger, &participantName);
+
+        logger->Info("Creating CAN controller '" + canControllerName + "'");
         auto* canController = participant->CreateCanController(canControllerName, canNetworkName);
 
         auto demoDevice = Device{ canControllerName, canNetworkName,[&logger, canController](CanFrame data) 
@@ -158,24 +163,24 @@ int main(int argc, char** argv)
         canController->AddFrameTransmitHandler(onCanAckCallback);
         canController->Start();
 
-        PromptForExit();
+        promptForExit();
     }
     catch (const SilKit::ConfigurationError& error)
     {
         std::cerr << "Invalid configuration: " << error.what() << std::endl;        
-        return CONFIGURATION_ERROR;
+        return CodeErrorConfiguration;
     }
     catch (const InvalidCli&)
     {
         print_demo_help(false);
         std::cerr << std::endl << "Invalid command line arguments." << std::endl;        
-        return CLI_ERROR;
+        return CodeErrorCli;
     }
     catch (const std::exception& error)
     {
         std::cerr << "Something went wrong: " << error.what() << std::endl;        
-        return OTHER_ERROR;
+        return CodeErrorOther;
     }
-    return NO_ERROR;
+    return CodeSuccess;
 }
 

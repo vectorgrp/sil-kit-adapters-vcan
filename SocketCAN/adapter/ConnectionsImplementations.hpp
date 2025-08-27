@@ -4,18 +4,12 @@
 
 #include <linux/can.h>
 #include <linux/can/raw.h>
-#include <iostream>
-#include <sstream>
-#include <memory>
 
-#include "AdapterUtils.hpp"
-#include "Exceptions.hpp"
-
-#include "asio/ts/io_context.hpp"
 #include "asio/ts/net.hpp"
 #include "asio/posix/stream_descriptor.hpp"
+
 #include "silkit/services/can/ICanController.hpp"
-#include "silkit/services/logging/ILogger.hpp"
+#include "silkit/services/logging/fwd_decl.hpp"
 #include "silkit/services/can/CanDatatypes.hpp"
 
 using namespace SilKit::Services::Can;

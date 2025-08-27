@@ -3,18 +3,15 @@
 
 #include <memory>
 
-#include "Exceptions.hpp"
-#include "AdapterUtils.hpp"
 #include "ConnectionsImplementations.hpp"
+#include "common/Exceptions.hpp"
 
-#include "asio/posix/stream_descriptor.hpp"
 #include "silkit/services/can/all.hpp"
-#include "silkit/services/can/string_utils.hpp"
 
-using namespace AdapterUtils;
-using namespace exceptions;
 using namespace std;
 using namespace SilKit::Services::Can;
+
+class ICanConnectionImpl;
 
 // Implements the connection with the vcan device
 class CanConnection : public std::enable_shared_from_this<CanConnection>
@@ -45,3 +42,26 @@ private:
         CanDeviceType deviceType;
     } _vcanDevice;
 };
+
+namespace adapters {
+
+struct UnsupportedCANFrame : public std::runtime_error
+{
+    UnsupportedCANFrame()
+        : std::runtime_error("CAN frame is not supported by the connected vcan device.")
+    {
+    }
+};
+
+struct InvalidVirtualCANDevice : public std::runtime_error
+{
+    InvalidVirtualCANDevice()
+        : std::runtime_error("An invalid or not supported virtual CAN device has been passed to the adapter.")
+    {
+    }
+};
+
+inline auto& throwInvalidFileDescriptorIf = throwIf<InvalidVirtualCANDevice>;
+inline auto& throwInvalidCANFrameIf = throwIf<UnsupportedCANFrame>;
+
+} // namespace exceptions

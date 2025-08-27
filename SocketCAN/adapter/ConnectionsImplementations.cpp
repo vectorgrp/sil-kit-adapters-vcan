@@ -1,6 +1,12 @@
 // Copyright (c) Vector Informatik GmbH. All rights reserved.
 
 #include "ConnectionsImplementations.hpp"
+#include "AdapterConnections.hpp"
+#include "AdapterUtils.hpp"
+
+#include "silkit/services/logging/all.hpp"
+
+using namespace AdapterUtils;
 
 ///////////////////////////////////////////////////////////
 ///   ICanConnectionImpl functions implementations      ///
@@ -59,7 +65,7 @@ CanFrame ClassicalCanConnectionImpl::SocketCANToSILKit()
     if (_frameToSilKit.can_id & CAN_ERR_FLAG)
     {
         // SIL Kit does not support error frames
-        throw exceptions::UnsupportedCANFrame();
+        throw adapters::UnsupportedCANFrame();
     }
 
     silkit_frame.dlc = _frameToSilKit.can_dlc;
@@ -71,8 +77,6 @@ CanFrame ClassicalCanConnectionImpl::SocketCANToSILKit()
     return silkit_frame;
 }
 
-
-
 // Writes the SIL Kit CanFrame to the stream_descriptor
 void ClassicalCanConnectionImpl:: WriteToStream(asio::posix::stream_descriptor* stream, const CanFrame& SilkitFrame)
 {
@@ -81,7 +85,7 @@ void ClassicalCanConnectionImpl:: WriteToStream(asio::posix::stream_descriptor* 
     if(silkit_frame_is_fd)
     {
         _frameType = INVALID_FRAME;
-        throw exceptions::UnsupportedCANFrame();
+        throw adapters::UnsupportedCANFrame();
     }
     else
     {
@@ -106,7 +110,7 @@ void ClassicalCanConnectionImpl:: WriteToStream(asio::posix::stream_descriptor* 
 
     if (sizeSent != sizeof(can_frame))
     {
-        throw exceptions::InvalidFrameSizeError{};
+        throw adapters::InvalidFrameSizeError{};
     }
 };
 
@@ -148,7 +152,7 @@ CanFrame CanFDConnectionImpl::SocketCANToSILKit()
     if (_frameToSilKit.can_id & CAN_ERR_FLAG)
     {
         // SIL Kit does not support error frames
-        throw exceptions::UnsupportedCANFrame();
+        throw adapters::UnsupportedCANFrame();
     }
 
     silkit_frame.sdt = 0; // set to 0 because this field is for XL format only
@@ -185,7 +189,7 @@ void CanFDConnectionImpl::WriteToStream(asio::posix::stream_descriptor* stream, 
         sizeSent = stream->write_some(asio::mutable_buffer(&_frameToVCAN, sizeof(_frameToVCAN)));
         if (sizeSent != sizeof(canfd_frame))
         {
-            throw exceptions::InvalidFrameSizeError{};
+            throw adapters::InvalidFrameSizeError{};
         }
     }
     else
@@ -195,12 +199,10 @@ void CanFDConnectionImpl::WriteToStream(asio::posix::stream_descriptor* stream, 
         sizeSent = stream->write_some(asio::mutable_buffer(&_frameToVCAN, sizeof(can_frame)));
         if (sizeSent != sizeof(can_frame))
         {
-            throw exceptions::InvalidFrameSizeError{};
+            throw adapters::InvalidFrameSizeError{};
         }
     }
 };
-
-
 
 inline can_frame SILKitToSocketCAN(const CanFrame& silkit_can_frame)
 {
