@@ -1,9 +1,9 @@
-// Copyright (c) Vector Informatik GmbH. All rights reserved.
+// SPDX-FileCopyrightText: Copyright 2025 Vector Informatik GmbH
+// SPDX-License-Identifier: MIT
 
 #pragma once
 
-namespace adapters 
-{
+namespace adapters {
 /// <summary>
 /// string containing the argument preceding the vcan device name.
 /// </summary>
@@ -14,4 +14,4 @@ extern const std::string canNameArg;
 /// </summary>
 extern const std::string networkArg;
 
-}
+} // namespace adapters

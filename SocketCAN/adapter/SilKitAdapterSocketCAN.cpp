@@ -1,4 +1,5 @@
-// Copyright (c) Vector Informatik GmbH. All rights reserved.
+// SPDX-FileCopyrightText: Copyright 2025 Vector Informatik GmbH
+// SPDX-License-Identifier: MIT
 #include <iostream>
 #include <unistd.h>
 
@@ -96,9 +97,7 @@ int main(int argc, char** argv)
 
         auto finalStateFuture = lifecycleService->StartLifecycle();
 
-        std::thread ioContextThread([&]() -> void {
-            io_context.run();
-        });
+        std::thread ioContextThread([&]() -> void { io_context.run(); });
 
         promptForExit();
 

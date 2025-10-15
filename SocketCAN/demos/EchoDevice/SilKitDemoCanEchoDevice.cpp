@@ -1,4 +1,5 @@
-// Copyright (c) Vector Informatik GmbH. All rights reserved.
+// SPDX-FileCopyrightText: Copyright 2025 Vector Informatik GmbH
+// SPDX-License-Identifier: MIT
 
 #include <iostream>
 #include <string>
@@ -28,13 +29,14 @@ const std::string networkArg = "--network";
 
 class Device
 {
-public: 
-    Device(const std::string& canDevName, const std::string& canNetName, std::function<void(CanFrame)> sendFrameCallback) : _sendFrameCallback(std::move(sendFrameCallback))
+public:
+    Device(const std::string& canDevName, const std::string& canNetName,
+           std::function<void(CanFrame)> sendFrameCallback)
+        : _sendFrameCallback(std::move(sendFrameCallback))
     {
     }
 
 public:
-
     // set CAN FD dlc field as a non-linear function of size of data field
     // see https://elearning.vector.com/mod/page/view.php?id=368
 
@@ -43,7 +45,7 @@ public:
         CanFrame canEchoFrame{};
         // assign an ID to the echo frame (received ID + 1)
         canEchoFrame = incomingData;
-        canEchoFrame.canId = incomingData.canId+1;
+        canEchoFrame.canId = incomingData.canId + 1;
         // silkit frame -> char array -> shift array -> silkit frame
         const unsigned int frameSize = incomingData.dataField.size();
         unsigned char tmpFrame[frameSize];
@@ -67,31 +69,39 @@ public:
         }
         catch (const std::exception& error)
         {
-            std::cerr << "Something went wrong: " << error.what() << std::endl;            
+            std::cerr << "Something went wrong: " << error.what() << std::endl;
         }
     }
-    
-private: 
+
+private:
     std::function<void(CanFrame)> _sendFrameCallback;
 };
 
 void print_demo_help(bool userRequested)
 {
     std::cout << "Usage (defaults in curly braces if you omit the switch):" << std::endl;
-    std::cout << "sil-kit-demo-can-echo-device [" << participantNameArg << " <participant's name{CanEchoDevice}>]\n"
-        "  [" << regUriArg << " silkit://<host{localhost}>:<port{8501}>]\n"
-        "  [" << networkArg << " <SIL Kit CAN network name{CAN1}>]\n"
-        "  [" << logLevelArg << " <Trace|Debug|Warn|{Info}|Error|Critical|Off>]\n";
-        std::cout << "\n"
-        "Example:\n"
-        "sil-kit-demo-can-echo-device " << participantNameArg << " EchoDevice " << networkArg << " CAN_NETWORK " << logLevelArg << " Off\n ";
+    std::cout << "sil-kit-demo-can-echo-device [" << participantNameArg
+              << " <participant's name{CanEchoDevice}>]\n"
+                 "  ["
+              << regUriArg
+              << " silkit://<host{localhost}>:<port{8501}>]\n"
+                 "  ["
+              << networkArg
+              << " <SIL Kit CAN network name{CAN1}>]\n"
+                 "  ["
+              << logLevelArg << " <Trace|Debug|Warn|{Info}|Error|Critical|Off>]\n";
+    std::cout << "\n"
+                 "Example:\n"
+                 "sil-kit-demo-can-echo-device "
+              << participantNameArg << " EchoDevice " << networkArg << " CAN_NETWORK " << logLevelArg << " Off\n ";
 
     if (!userRequested)
         std::cout << "\n"
-            "Pass "<<helpArg<<" to get this message.\n";
+                     "Pass "
+                  << helpArg << " to get this message.\n";
 }
 
- /**************************************************************************************************
+/**************************************************************************************************
  * Main Function
  **************************************************************************************************/
 
@@ -117,7 +127,8 @@ int main(int argc, char** argv)
         const std::string participantConfigurationString =
             R"({ "Logging": { "Sinks": [ { "Type": "Stdout", "Level": ")" + loglevel + R"("} ] } })";
 
-        auto participantConfiguration = SilKit::Config::ParticipantConfigurationFromString(participantConfigurationString);
+        auto participantConfiguration =
+            SilKit::Config::ParticipantConfigurationFromString(participantConfigurationString);
 
         SilKit::Services::Logging::ILogger* logger;
         auto participant = CreateParticipant(argc, argv, logger, &participantName);
@@ -125,18 +136,18 @@ int main(int argc, char** argv)
         logger->Info("Creating CAN controller '" + canControllerName + "'");
         auto* canController = participant->CreateCanController(canControllerName, canNetworkName);
 
-        auto demoDevice = Device{ canControllerName, canNetworkName,[&logger, canController](CanFrame data) 
-                                {
-                                    static intptr_t transmitId = 0;
-                                    canController->SendFrame(CanFrame{ std::move(data) }, reinterpret_cast<void*>(++transmitId));
-                                    
-                                    std::ostringstream SILKitDebugMessage;
-                                    SILKitDebugMessage << "Demo >> SIL Kit : CAN frame (dlc=" << (int)data.dlc << ", txId=" << transmitId << ")";
-                                    logger->Debug(SILKitDebugMessage.str());
-                                }};
+        auto demoDevice = Device{canControllerName, canNetworkName, [&logger, canController](CanFrame data) {
+            static intptr_t transmitId = 0;
+            canController->SendFrame(CanFrame{std::move(data)}, reinterpret_cast<void*>(++transmitId));
 
-        auto onReceiveCanMessageFromSilKit = [&logger, &demoDevice](ICanController* /*controller*/, const CanFrameEvent& msg) 
-        {
+            std::ostringstream SILKitDebugMessage;
+            SILKitDebugMessage << "Demo >> SIL Kit : CAN frame (dlc=" << (int)data.dlc << ", txId=" << transmitId
+                               << ")";
+            logger->Debug(SILKitDebugMessage.str());
+        }};
+
+        auto onReceiveCanMessageFromSilKit = [&logger, &demoDevice](ICanController* /*controller*/,
+                                                                    const CanFrameEvent& msg) {
             std::ostringstream SILKitDebugMessage;
 
             SILKitDebugMessage << "SIL Kit >> Demo: CAN frame (dlc=" << msg.frame.dlc << ")";
@@ -167,20 +178,19 @@ int main(int argc, char** argv)
     }
     catch (const SilKit::ConfigurationError& error)
     {
-        std::cerr << "Invalid configuration: " << error.what() << std::endl;        
+        std::cerr << "Invalid configuration: " << error.what() << std::endl;
         return CodeErrorConfiguration;
     }
     catch (const InvalidCli&)
     {
         print_demo_help(false);
-        std::cerr << std::endl << "Invalid command line arguments." << std::endl;        
+        std::cerr << std::endl << "Invalid command line arguments." << std::endl;
         return CodeErrorCli;
     }
     catch (const std::exception& error)
     {
-        std::cerr << "Something went wrong: " << error.what() << std::endl;        
+        std::cerr << "Something went wrong: " << error.what() << std::endl;
         return CodeErrorOther;
     }
     return CodeSuccess;
 }
-

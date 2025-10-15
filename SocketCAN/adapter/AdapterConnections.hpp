@@ -1,4 +1,5 @@
-// Copyright (c) Vector Informatik GmbH. All rights reserved.
+// SPDX-FileCopyrightText: Copyright 2025 Vector Informatik GmbH
+// SPDX-License-Identifier: MIT
 #pragma once
 
 #include <memory>
@@ -17,11 +18,13 @@ class ICanConnectionImpl;
 class CanConnection : public std::enable_shared_from_this<CanConnection>
 {
 private:
-    CanConnection(asio::io_context& io_context,  ICanController* silkitCtrl, SilKit::Services::Logging::ILogger* logger, const char* canDeviceName);
+    CanConnection(asio::io_context& io_context, ICanController* silkitCtrl, SilKit::Services::Logging::ILogger* logger,
+                  const char* canDeviceName);
     CanConnection(const CanConnection&) = delete;
 
 public:
-    static shared_ptr<CanConnection> Create(asio::io_context& io_context, ICanController* silkitCtrl, SilKit::Services::Logging::ILogger* logger, const char* canDeviceName);
+    static shared_ptr<CanConnection> Create(asio::io_context& io_context, ICanController* silkitCtrl,
+                                            SilKit::Services::Logging::ILogger* logger, const char* canDeviceName);
     void SendSILKitCanFrameToVirtualCanDevice(const CanFrame& SilkitFrame);
     void ReceiveCanFrameFromVirtualCanDevice();
 
@@ -64,4 +67,4 @@ struct InvalidVirtualCANDevice : public std::runtime_error
 inline auto& throwInvalidFileDescriptorIf = throwIf<InvalidVirtualCANDevice>;
 inline auto& throwInvalidCANFrameIf = throwIf<UnsupportedCANFrame>;
 
-} // namespace exceptions
+} // namespace adapters

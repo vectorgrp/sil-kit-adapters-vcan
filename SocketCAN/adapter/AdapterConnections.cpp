@@ -1,4 +1,5 @@
-// Copyright (c) Vector Informatik GmbH. All rights reserved.
+// SPDX-FileCopyrightText: Copyright 2025 Vector Informatik GmbH
+// SPDX-License-Identifier: MIT
 
 #include "AdapterConnections.hpp"
 #include "AdapterUtils.hpp"
@@ -10,7 +11,8 @@
 using namespace adapters;
 using namespace AdapterUtils;
 
-CanConnection::CanConnection(asio::io_context& io_context, ICanController* silkitCtrl, SilKit::Services::Logging::ILogger* logger, const char* canDeviceName)
+CanConnection::CanConnection(asio::io_context& io_context, ICanController* silkitCtrl,
+                             SilKit::Services::Logging::ILogger* logger, const char* canDeviceName)
     : _canDeviceStream{io_context}
     , _silkitCtrl(silkitCtrl)
     , _logger(logger)
@@ -46,33 +48,36 @@ void CanConnection::SendSILKitCanFrameToVirtualCanDevice(const CanFrame& SilkitF
 
 void CanConnection::ReceiveCanFrameFromVirtualCanDevice()
 {
-    _canDeviceStream.async_read_some(_canConnectionImpl->GetBuffer(),
-         [that = shared_from_this()](const std::error_code& ec, const std::size_t bytes_received)
-         {
-             try
-             {
-                 if (ec)
-                 {
-                     std::string SILKitErrorMessage = "Unable to receive data from vcan device.\n"
-                                                      "Error code: " + std::to_string(ec.value()) + " (" + ec.message() + ")\n"
-                                                      "Error category: " + ec.category().name();
-                     that->_logger->Error(SILKitErrorMessage);
-                 }
-                 else
-                 {
-                     that->_canConnectionImpl->UpdateFrameType(bytes_received);
-                     that->_canConnectionImpl->HandleReceivedCanFrameFromVirtualCanDevice(that->_silkitCtrl, that->_logger);
-                 }
-             }
-             catch (const std::exception& ex)
-             {
-                 // Handle any exception that might occur
-                 std::string SILKitErrorMessage = "Exception occurred: " + std::string(ex.what());
-                 that->_logger->Error(SILKitErrorMessage);
-             }
-             // Continue with the next read
-             that->ReceiveCanFrameFromVirtualCanDevice();
-         });
+    _canDeviceStream.async_read_some(
+        _canConnectionImpl->GetBuffer(),
+        [that = shared_from_this()](const std::error_code& ec, const std::size_t bytes_received) {
+        try
+        {
+            if (ec)
+            {
+                std::string SILKitErrorMessage = "Unable to receive data from vcan device.\n"
+                                                 "Error code: "
+                                                 + std::to_string(ec.value()) + " (" + ec.message()
+                                                 + ")\n"
+                                                   "Error category: "
+                                                 + ec.category().name();
+                that->_logger->Error(SILKitErrorMessage);
+            }
+            else
+            {
+                that->_canConnectionImpl->UpdateFrameType(bytes_received);
+                that->_canConnectionImpl->HandleReceivedCanFrameFromVirtualCanDevice(that->_silkitCtrl, that->_logger);
+            }
+        }
+        catch (const std::exception& ex)
+        {
+            // Handle any exception that might occur
+            std::string SILKitErrorMessage = "Exception occurred: " + std::string(ex.what());
+            that->_logger->Error(SILKitErrorMessage);
+        }
+        // Continue with the next read
+        that->ReceiveCanFrameFromVirtualCanDevice();
+    });
 }
 
 // Initialise the connection with the vcan device, return an initialised VCANDevice object.
@@ -84,7 +89,8 @@ void CanConnection::InitialiseVirtualCANConnection(const char* canDeviceName)
     if (_vcanDevice.fileDescriptor < 0)
     {
         int socketCreateErrorCode = errno; // Capture the error code
-        _logger->Error("Socket creation failed with error code: " + to_string(socketCreateErrorCode) + ExtractErrorMessage(socketCreateErrorCode));
+        _logger->Error("Socket creation failed with error code: " + to_string(socketCreateErrorCode)
+                       + ExtractErrorMessage(socketCreateErrorCode));
         close(_vcanDevice.fileDescriptor);
         throw InvalidVirtualCANDevice();
     }
@@ -93,7 +99,8 @@ void CanConnection::InitialiseVirtualCANConnection(const char* canDeviceName)
     if (canDeviceName == nullptr || strlen(canDeviceName) >= IFNAMSIZ)
     {
         _logger->Error("Invalid vcan device name used for [--can-name] arg.\n"
-                       "(Hint): Ensure that the name provided is within a valid length between (1 and " + to_string(IFNAMSIZ-1) + ") characters.");
+                       "(Hint): Ensure that the name provided is within a valid length between (1 and "
+                       + to_string(IFNAMSIZ - 1) + ") characters.");
         close(_vcanDevice.fileDescriptor);
         throw InvalidVirtualCANDevice();
     }
@@ -104,14 +111,16 @@ void CanConnection::InitialiseVirtualCANConnection(const char* canDeviceName)
     if (errorCode < 0)
     {
         int ioctlError = errno;
-        _logger->Error("Failed to execute IOCTL system call with error code: " + to_string(ioctlError)+ ExtractErrorMessage(ioctlError)
-                       + "\n(Hint): Ensure that the network interface \"" + std::string(canDeviceName)
-                       + "\" specified in [--can-name] exists and is operational.");
+        _logger->Error("Failed to execute IOCTL system call with error code: " + to_string(ioctlError)
+                       + ExtractErrorMessage(ioctlError) + "\n(Hint): Ensure that the network interface \""
+                       + std::string(canDeviceName) + "\" specified in [--can-name] exists and is operational.");
         close(_vcanDevice.fileDescriptor);
         throw InvalidVirtualCANDevice();
     }
 
-    struct sockaddr_can socketAddress{};
+    struct sockaddr_can socketAddress
+    {
+    };
     socketAddress.can_family = AF_CAN;
     socketAddress.can_ifindex = ifr.ifr_ifindex;
 
@@ -130,40 +139,43 @@ void CanConnection::InitialiseVirtualCANConnection(const char* canDeviceName)
     if (errorCode < 0)
     {
         int ioctlError = errno;
-        _logger->Error("Failed to execute IOCTL system call with error code: " + to_string(ioctlError)+ ExtractErrorMessage(ioctlError)
-                       + "\n(Hint): Ensure that the network interface \"" + std::string(canDeviceName)
-                       + "\" specified in [--can-name] exists and is operational.");
+        _logger->Error("Failed to execute IOCTL system call with error code: " + to_string(ioctlError)
+                       + ExtractErrorMessage(ioctlError) + "\n(Hint): Ensure that the network interface \""
+                       + std::string(canDeviceName) + "\" specified in [--can-name] exists and is operational.");
         close(_vcanDevice.fileDescriptor);
         throw InvalidVirtualCANDevice();
     }
 
-    _vcanDevice.deviceType = (ifr.ifr_mtu == CANFD_MTU)? CAN_FD_DEVICE : CLASSICAL_CAN_DEVICE;
+    _vcanDevice.deviceType = (ifr.ifr_mtu == CANFD_MTU) ? CAN_FD_DEVICE : CLASSICAL_CAN_DEVICE;
 
-    if(_vcanDevice.deviceType == CAN_FD_DEVICE)
+    if (_vcanDevice.deviceType == CAN_FD_DEVICE)
     {
         // For CAN FD capable devices, keep CAN_RAW_FD_FRAMES enabled so that the application can send both CAN frames and CAN FD frames
         int enable_CAN_RAW_FD_FRAMES = 1; /* 0 = disabled (default), 1 = enabled */
-        errorCode = setsockopt(_vcanDevice.fileDescriptor, SOL_CAN_RAW, CAN_RAW_FD_FRAMES,&enable_CAN_RAW_FD_FRAMES, sizeof(enable_CAN_RAW_FD_FRAMES));
-        if(errorCode < 0)
+        errorCode = setsockopt(_vcanDevice.fileDescriptor, SOL_CAN_RAW, CAN_RAW_FD_FRAMES, &enable_CAN_RAW_FD_FRAMES,
+                               sizeof(enable_CAN_RAW_FD_FRAMES));
+        if (errorCode < 0)
         {
             int socketOptError = errno;
-            _logger->Error("Enabling CAN FD support on socket failed with error code: " + to_string(socketOptError) + ExtractErrorMessage(socketOptError));
+            _logger->Error("Enabling CAN FD support on socket failed with error code: " + to_string(socketOptError)
+                           + ExtractErrorMessage(socketOptError));
             close(_vcanDevice.fileDescriptor);
             throw InvalidVirtualCANDevice();
         }
     }
 
-    _logger->Info("The used " + std::string(canDeviceName) + " vcan device is" + (_vcanDevice.deviceType== CAN_FD_DEVICE ? "" : " not") + " CAN FD compatible (MTU = " + to_string(ifr.ifr_mtu) +")");
+    _logger->Info("The used " + std::string(canDeviceName) + " vcan device is"
+                  + (_vcanDevice.deviceType == CAN_FD_DEVICE ? "" : " not")
+                  + " CAN FD compatible (MTU = " + to_string(ifr.ifr_mtu) + ")");
     _logger->Info("vcan device [" + std::string(canDeviceName) + "] successfully opened");
 
     throwInvalidFileDescriptorIf((_vcanDevice.fileDescriptor < 0));
 }
 
-shared_ptr<CanConnection> CanConnection::Create(asio::io_context& io_context,
-                                                ICanController* silkitCtrl,
+shared_ptr<CanConnection> CanConnection::Create(asio::io_context& io_context, ICanController* silkitCtrl,
                                                 SilKit::Services::Logging::ILogger* logger, const char* canDeviceName)
 {
-    shared_ptr<CanConnection> ptr(new CanConnection(io_context, silkitCtrl, logger,canDeviceName));
+    shared_ptr<CanConnection> ptr(new CanConnection(io_context, silkitCtrl, logger, canDeviceName));
     InitialiseSILKitCANConnection(silkitCtrl, ptr);
     return ptr;
 }
@@ -184,14 +196,13 @@ void CanConnection::InitialiseSILKitCANConnection(ICanController* silkitCtrl, co
                 (recievedFrame.flags & SilKit_CanFrameFlag_brs) && (recievedFrame.flags & SilKit_CanFrameFlag_fdf);
             std::ostringstream SILKitDebugMessage;
             SILKitDebugMessage << "SIL Kit >> CAN device: " << (frame_is_fd ? "CAN FD frame " : "CAN frame ")
-                               << "(payload = " << recievedFrame.dataField.size() << " [bytes], CAN ID=0x"
-                               << std::hex << static_cast<int>(recievedFrame.canId) << ")";
+                               << "(payload = " << recievedFrame.dataField.size() << " [bytes], CAN ID=0x" << std::hex
+                               << static_cast<int>(recievedFrame.canId) << ")";
             that->_logger->Debug(SILKitDebugMessage.str());
             that->SendSILKitCanFrameToVirtualCanDevice(recievedFrame);
         });
 
-        silkitCtrl->AddFrameTransmitHandler( [that](ICanController* /*controller*/,
-                                                         const CanFrameTransmitEvent& ack) {
+        silkitCtrl->AddFrameTransmitHandler([that](ICanController* /*controller*/, const CanFrameTransmitEvent& ack) {
             std::ostringstream SILKitDebugMessage;
             if (ack.status == CanTransmitStatus::Transmitted)
             {

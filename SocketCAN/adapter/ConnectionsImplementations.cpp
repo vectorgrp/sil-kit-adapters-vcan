@@ -1,4 +1,5 @@
-// Copyright (c) Vector Informatik GmbH. All rights reserved.
+// SPDX-FileCopyrightText: Copyright 2025 Vector Informatik GmbH
+// SPDX-License-Identifier: MIT
 
 #include "ConnectionsImplementations.hpp"
 #include "AdapterConnections.hpp"
@@ -11,7 +12,8 @@ using namespace AdapterUtils;
 ///////////////////////////////////////////////////////////
 ///   ICanConnectionImpl functions implementations      ///
 ///////////////////////////////////////////////////////////
-void ICanConnectionImpl::HandleReceivedCanFrameFromVirtualCanDevice(ICanController* canController, SilKit::Services::Logging::ILogger* logger)
+void ICanConnectionImpl::HandleReceivedCanFrameFromVirtualCanDevice(ICanController* canController,
+                                                                    SilKit::Services::Logging::ILogger* logger)
 {
     CanFrame frame = SocketCANToSILKit();
     try
@@ -78,11 +80,12 @@ CanFrame ClassicalCanConnectionImpl::SocketCANToSILKit()
 }
 
 // Writes the SIL Kit CanFrame to the stream_descriptor
-void ClassicalCanConnectionImpl:: WriteToStream(asio::posix::stream_descriptor* stream, const CanFrame& SilkitFrame)
+void ClassicalCanConnectionImpl::WriteToStream(asio::posix::stream_descriptor* stream, const CanFrame& SilkitFrame)
 {
-    bool silkit_frame_is_fd = (SilkitFrame.flags & SilKit_CanFrameFlag_brs) && (SilkitFrame.flags & SilKit_CanFrameFlag_fdf);
+    bool silkit_frame_is_fd =
+        (SilkitFrame.flags & SilKit_CanFrameFlag_brs) && (SilkitFrame.flags & SilKit_CanFrameFlag_fdf);
     // if the received SILKit frame is a Classical CAN frame : OK. Invalid frame otherwise.
-    if(silkit_frame_is_fd)
+    if (silkit_frame_is_fd)
     {
         _frameType = INVALID_FRAME;
         throw adapters::UnsupportedCANFrame();
@@ -100,9 +103,9 @@ void ClassicalCanConnectionImpl:: WriteToStream(asio::posix::stream_descriptor* 
             _frameToVCAN.can_id |= CAN_RTR_FLAG;
         }
         _frameToVCAN.can_dlc = SilkitFrame.dlc;
-        memset(& _frameToVCAN.__pad, 0, sizeof( _frameToVCAN.__pad)); // set padding to zero
-        memset(& _frameToVCAN.__res0, 0, sizeof( _frameToVCAN.__res0)); // set reserved field to zero
-        memcpy( _frameToVCAN.data, SilkitFrame.dataField.data(), SilkitFrame.dataField.size());
+        memset(&_frameToVCAN.__pad, 0, sizeof(_frameToVCAN.__pad)); // set padding to zero
+        memset(&_frameToVCAN.__res0, 0, sizeof(_frameToVCAN.__res0)); // set reserved field to zero
+        memcpy(_frameToVCAN.data, SilkitFrame.dataField.data(), SilkitFrame.dataField.size());
         _frameType = PURE_CLASSIC_FRAME;
     }
 
@@ -125,7 +128,7 @@ CanFrame CanFDConnectionImpl::SocketCANToSILKit()
     // initialise all flags to 0
     silkit_frame.flags = 0;
 
-    if(_frameType == PURE_FD_FRAME)
+    if (_frameType == PURE_FD_FRAME)
     {
         // set CAN FD related flags in the SIL Kit CAN frame
         silkit_frame.flags = static_cast<CanFrameFlagMask>(CanFrameFlag::Fdf) // FD Format Indicator
@@ -158,8 +161,8 @@ CanFrame CanFDConnectionImpl::SocketCANToSILKit()
     silkit_frame.sdt = 0; // set to 0 because this field is for XL format only
     silkit_frame.vcid = 0; // set to 0 because this field is for XL format only
     silkit_frame.af = 0; // set to 0 because this field is for XL format only
-    silkit_frame.dataField = SilKit::Util::Span<const uint8_t>( _frameToSilKit.data,  _frameToSilKit.len);
-    silkit_frame.dlc = AdapterUtils::CalculateDLC( _frameToSilKit.len);
+    silkit_frame.dataField = SilKit::Util::Span<const uint8_t>(_frameToSilKit.data, _frameToSilKit.len);
+    silkit_frame.dlc = AdapterUtils::CalculateDLC(_frameToSilKit.len);
     return silkit_frame;
 };
 
@@ -176,12 +179,12 @@ void CanFDConnectionImpl::WriteToStream(asio::posix::stream_descriptor* stream, 
     {
         _frameToVCAN.can_id |= CAN_RTR_FLAG;
     }
-    memset(& _frameToVCAN.__res0, 0, sizeof( _frameToVCAN.__res0));
-    memset(& _frameToVCAN.__res1, 0, sizeof( _frameToVCAN.__res1));
-    memcpy( _frameToVCAN.data, SilkitFrame.dataField.data(), SilkitFrame.dataField.size());
+    memset(&_frameToVCAN.__res0, 0, sizeof(_frameToVCAN.__res0));
+    memset(&_frameToVCAN.__res1, 0, sizeof(_frameToVCAN.__res1));
+    memcpy(_frameToVCAN.data, SilkitFrame.dataField.data(), SilkitFrame.dataField.size());
     // check if frame is a CAN FD frame
     size_t sizeSent;
-    if((SilkitFrame.flags & SilKit_CanFrameFlag_brs) && (SilkitFrame.flags & SilKit_CanFrameFlag_fdf))
+    if ((SilkitFrame.flags & SilKit_CanFrameFlag_brs) && (SilkitFrame.flags & SilKit_CanFrameFlag_fdf))
     {
         // Set the frame length based on whether it's a CAN FD frame or a classical CAN frame
         _frameToVCAN.flags = CANFD_BRS; // Bit Rate Switch
@@ -226,4 +229,3 @@ inline can_frame SILKitToSocketCAN(const CanFrame& silkit_can_frame)
     memcpy(socketcan_frame.data, silkit_can_frame.dataField.data(), silkit_can_frame.dataField.size());
     return socketcan_frame;
 }
-

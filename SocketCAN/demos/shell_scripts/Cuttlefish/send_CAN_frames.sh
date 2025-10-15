@@ -1,4 +1,6 @@
 #!/bin/sh
+# SPDX-FileCopyrightText: Copyright 2025 Vector Informatik GmbH
+# SPDX-License-Identifier: MIT
 
 # Check if CAN_UTILS_BUILD_PATH is set and not empty
 if [ -z "${CAN_UTILS_BUILD_PATH}" ]; then

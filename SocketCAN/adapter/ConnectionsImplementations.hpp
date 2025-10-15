@@ -1,4 +1,5 @@
-// Copyright (c) Vector Informatik GmbH. All rights reserved.
+// SPDX-FileCopyrightText: Copyright 2025 Vector Informatik GmbH
+// SPDX-License-Identifier: MIT
 
 #pragma once
 
@@ -38,7 +39,8 @@ struct ICanConnectionImpl
     // Writes the SIL Kit CanFrame to the stream_descriptor
     virtual void WriteToStream(asio::posix::stream_descriptor* stream, const CanFrame& SilkitFrame) = 0;
     // A function that is used as a callback that handles received frames from the vcan device, sending them on the SIL Kit network
-    void HandleReceivedCanFrameFromVirtualCanDevice(ICanController* canController, SilKit::Services::Logging::ILogger* logger);
+    void HandleReceivedCanFrameFromVirtualCanDevice(ICanController* canController,
+                                                    SilKit::Services::Logging::ILogger* logger);
 
 protected:
     CanFrameType _frameType;
@@ -50,11 +52,17 @@ public:
     // Default constructor for ClassicalCanConnectionImpl
     ClassicalCanConnectionImpl() = default;
     // Update the _frameType attribute
-    void UpdateFrameType(const std::size_t bytes_received) override { _frameType = PURE_CLASSIC_FRAME; };
+    void UpdateFrameType(const std::size_t bytes_received) override
+    {
+        _frameType = PURE_CLASSIC_FRAME;
+    };
     // Convert an instance of ClassicalCanConnectionImpl into a SIL Kit CanFrame
     CanFrame SocketCANToSILKit() override;
     // Returns an asio mutable buffer from the ClassicalCanConnectionImpl
-    asio::mutable_buffer GetBuffer() override { return asio::buffer(&_frameToSilKit, sizeof(_frameToSilKit)); };
+    asio::mutable_buffer GetBuffer() override
+    {
+        return asio::buffer(&_frameToSilKit, sizeof(_frameToSilKit));
+    };
     // Writes the SIL Kit CanFrame to the stream_descriptor
     void WriteToStream(asio::posix::stream_descriptor* stream, const CanFrame& SilkitFrame) override;
 
@@ -68,11 +76,17 @@ public:
     // Default constructor for ClassicalCanConnectionImpl
     CanFDConnectionImpl() = default;
     // Update the _frameType attribute
-    void UpdateFrameType(const std::size_t bytes_received) override { _frameType = (bytes_received == CANFD_MTU)? PURE_FD_FRAME : FD_CLASSIC_FRAME;};
+    void UpdateFrameType(const std::size_t bytes_received) override
+    {
+        _frameType = (bytes_received == CANFD_MTU) ? PURE_FD_FRAME : FD_CLASSIC_FRAME;
+    };
     // Convert an instance of CanFDConnectionImpl into a SIL Kit CanFrame
     CanFrame SocketCANToSILKit() override;
     // Returns an asio mutable buffer from the CanFDConnectionImpl
-    asio::mutable_buffer GetBuffer() override { return asio::buffer(&_frameToSilKit, sizeof(_frameToSilKit)); };
+    asio::mutable_buffer GetBuffer() override
+    {
+        return asio::buffer(&_frameToSilKit, sizeof(_frameToSilKit));
+    };
     // Writes the SIL Kit CanFrame to the stream_descriptor
     void WriteToStream(asio::posix::stream_descriptor* stream, const CanFrame& SilkitFrame) override;
 

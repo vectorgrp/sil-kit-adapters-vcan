@@ -1,4 +1,6 @@
 #!/bin/bash
+# SPDX-FileCopyrightText: Copyright 2025 Vector Informatik GmbH
+# SPDX-License-Identifier: MIT
 
 # This script is uniquely used for testing and demo purposes of the adapter
 # It takes a mandatory <vcan device name> argument and an optional [-mtu16] flag

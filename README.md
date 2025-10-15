@@ -1,4 +1,12 @@
 # Vector SIL Kit Adapter for virtual CAN (Linux only)
+[![Vector Informatik](https://img.shields.io/badge/Vector%20Informatik-rgb(180,0,50))](https://www.vector.com/int/en/)
+[![SocialNetwork](https://img.shields.io/badge/vectorgrp%20LinkedIn®-rgb(0,113,176))](https://www.linkedin.com/company/vectorgrp/)\
+[![ReleaseBadge](https://img.shields.io/github/v/release/vectorgrp/sil-kit-adapters-vcan.svg)](https://github.com/vectorgrp/sil-kit-adapters-vcan/releases)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/vectorgrp/sil-kit-adapters-vcan/blob/main/LICENSE)
+[![Linux Builds](https://github.com/vectorgrp/sil-kit-adapters-vcan/actions/workflows/build-linux-release.yml/badge.svg)](https://github.com/vectorgrp/sil-kit-adapters-vcan/actions/workflows/build-linux-release.yml)\
+[![SIL Kit](https://img.shields.io/badge/SIL%20Kit-353b42?logo=github&logoColor=969da4)](https://github.com/vectorgrp/sil-kit)
+[![SocketCAN](https://img.shields.io/badge/SocketCAN-353b42?logo=linux)](https://docs.kernel.org/networking/can.html)
+
 This collection of software is provided to illustrate how the [Vector SIL Kit](https://github.com/vectorgrp/sil-kit/)
 can be attached to a virtual CAN (Controller Area Network) interface [SocketCAN](https://docs.kernel.org/networking/can.html) running in Linux kernel.
 
