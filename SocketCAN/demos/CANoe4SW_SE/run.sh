@@ -5,7 +5,7 @@
 script_root=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 # Set a default path for canoe4sw-se installation directory
-default_canoe4sw_se_install_dir="/opt/vector/canoe4sw-se"
+default_canoe4sw_se_install_dir="/opt/vector/canoe-server-edition"
 
 # Check if the executable exists at the default path
 if [[ -x "$default_canoe4sw_se_install_dir/canoe4sw-se" ]]; then
@@ -16,6 +16,9 @@ else
 fi
 
 if [[ -n "$canoe4sw_se_install_dir" ]]; then
+  export canoe4sw_se_install_dir
+  $script_root/createEnvironment.sh
+
 	echo "canoe4sw-se found at location: $canoe4sw_se_install_dir"
 	$canoe4sw_se_install_dir/canoe4sw-se --version
 	#run tests

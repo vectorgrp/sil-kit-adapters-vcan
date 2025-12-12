@@ -3,6 +3,12 @@
 cmake_minimum_required(VERSION 3.13)
 project(VectorSilKitAdapterVcan)
 
+option(BUILD_LINUX_PACKAGE "Creates a SIL Kit Adapter virtual CAN build suitable for package managers in Linux Distributions (.deb)" OFF)
+
+if(BUILD_LINUX_PACKAGE)
+    add_subdirectory(docs/man)
+endif()
+
 set(SILKIT_ADAPTER_VCAN_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin")
 set(SILKIT_ADAPTER_VCAN_LIBRARY_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/lib")
 
@@ -24,6 +30,7 @@ include(common/cmake/InstallFunctions.cmake)
 install_adapter_source(
     ${CMAKE_CURRENT_SOURCE_DIR}/SocketCAN
     ${CMAKE_CURRENT_SOURCE_DIR}/common
+    ${CMAKE_CURRENT_SOURCE_DIR}/docs
     ${CMAKE_CURRENT_SOURCE_DIR}/QEMU
     ${CMAKE_CURRENT_SOURCE_DIR}/third_party
     ${CMAKE_CURRENT_SOURCE_DIR}/.devcontainer
@@ -54,6 +61,7 @@ install_scripts_to(SocketCAN/demos/shell_scripts/Cuttlefish
 install_scripts_to(SocketCAN/demos/CANoe4SW_SE
     ${CMAKE_CURRENT_SOURCE_DIR}/SocketCAN/demos/CANoe4SW_SE/run.sh
     ${CMAKE_CURRENT_SOURCE_DIR}/SocketCAN/demos/CANoe4SW_SE/run_all.sh
+    ${CMAKE_CURRENT_SOURCE_DIR}/SocketCAN/demos/CANoe4SW_SE/createEnvironment.sh
 )
 
 include(GNUInstallDirs)

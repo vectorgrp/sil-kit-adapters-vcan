@@ -11,6 +11,10 @@ lib/
 # ignore IDE directories
 .idea/
 .vs/
+.vscode/
+
+# needed for devcontainer feature 
+!.vscode/tasks.json
 
 # ignore log files
 *.out
