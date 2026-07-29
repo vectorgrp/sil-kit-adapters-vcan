@@ -1,6 +1,6 @@
 # Connecting a QEMU image with a SocketCAN Interface to SIL Kit
 
-This demonstration illustrates the utilization of the SIL Kit Adapter vcan to establish a connection between a QEMU image equipped with a SocketCAN Interface and the Vector SIL Kit.
+This demonstration illustrates the utilization of the SIL Kit Adapter vcan to establish a connection between a QEMU image equipped with a SocketCAN Interface and the SIL Kit.
 
 A comprehensive, step-by-step guide is provided to generate CAN traffic from within a QEMU image, which is then routed through a CAN interface provided by the QEMU image itself. The adapter is designed to manage this traffic, ensuring that CAN frames are efficiently transmitted to and from the SIL Kit CAN network.
 

@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: Copyright 2025 Vector Informatik GmbH
 # SPDX-License-Identifier: MIT
 cmake_minimum_required(VERSION 3.13)
-project(VectorSilKitAdapterVcan)
+project(SilKitAdapterVcan)
 
 option(BUILD_LINUX_PACKAGE "Creates a SIL Kit Adapter virtual CAN build suitable for package managers in Linux Distributions (.deb)" OFF)
 

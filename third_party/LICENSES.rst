@@ -1,7 +1,7 @@
-Vector SIL Kit Adapter for virtual CAN Third Party Libraries
+SIL Kit Adapter for virtual CAN Third Party Libraries
 ======================================
 
-The Vector SIL Kit Adapter for virtual CAN uses the following third party software components which are governed by their respective licenses:
+The SIL Kit Adapter for virtual CAN uses the following third party software components which are governed by their respective licenses:
 
  1. Asio C++ Library
  2. softprops/action-gh-release

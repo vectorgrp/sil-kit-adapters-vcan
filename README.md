@@ -1,4 +1,4 @@
-# Vector SIL Kit Adapter for virtual CAN (Linux only)
+# SIL Kit Adapter for virtual CAN (Linux only)
 [![Vector Informatik](https://img.shields.io/badge/Vector%20Informatik-rgb(180,0,50))](https://www.vector.com/int/en/)
 [![SocialNetwork](https://img.shields.io/badge/vectorgrp%20LinkedIn®-rgb(0,113,176))](https://www.linkedin.com/company/vectorgrp/)\
 [![ReleaseBadge](https://img.shields.io/github/v/release/vectorgrp/sil-kit-adapters-vcan.svg)](https://github.com/vectorgrp/sil-kit-adapters-vcan/releases)
@@ -7,7 +7,7 @@
 [![SIL Kit](https://img.shields.io/badge/SIL%20Kit-353b42?logo=github&logoColor=969da4)](https://github.com/vectorgrp/sil-kit)
 [![SocketCAN](https://img.shields.io/badge/SocketCAN-353b42?logo=linux)](https://docs.kernel.org/networking/can.html)
 
-This collection of software is provided to illustrate how the [Vector SIL Kit](https://github.com/vectorgrp/sil-kit/)
+This collection of software is provided to illustrate how the [SIL Kit](https://github.com/vectorgrp/sil-kit/)
 can be attached to a virtual CAN (Controller Area Network) interface [SocketCAN](https://docs.kernel.org/networking/can.html) running in Linux kernel.
 
 This repository contains instructions to build the adapter and set up a minimal working development environment.
@@ -39,7 +39,7 @@ Otherwise clone the standalone version of asio manually:
     git clone --branch asio-1-24-0 https://github.com/chriskohlhoff/asio.git third_party/asio
 
 ### Build the Adapter
-To build the adapter, you'll need an ubuntu SIL Kit package ``SilKit-x.y.z-$ubuntu``. You can download it directly from [Vector SIL Kit Releases](https://github.com/vectorgrp/sil-kit/releases). The easiest way would be to download it with your web browser, unzip it and place it on your file system, where it also can be accessed by ``bash``.
+To build the adapter, you'll need an ubuntu SIL Kit package ``SilKit-x.y.z-$ubuntu``. You can download it directly from [SIL Kit Releases](https://github.com/vectorgrp/sil-kit/releases). The easiest way would be to download it with your web browser, unzip it and place it on your file system, where it also can be accessed by ``bash``.
 
 The adapter and demos are built using ``cmake``:
 
@@ -75,9 +75,9 @@ Unzip the package that was generated and use the same toolchain file to cross-bu
 Lastly, update the LD_LIBRARY_PATH in your Android environment to point to the location of the SIL Kit shared library, which can be found in the generated lib folder.
 
 ## b) Getting Started with pre-built Adapter and Demos
-Download a preview or a release of the adapter directly from [Vector SIL Kit Adapter for virtual CAN Releases](https://github.com/vectorgrp/sil-kit-adapters-vcan/releases).
+Download a preview or a release of the adapter directly from [SIL Kit Adapter for virtual CAN Releases](https://github.com/vectorgrp/sil-kit-adapters-vcan/releases).
 
-You should also download a SIL Kit Release directly from [Vector SIL Kit Releases](https://github.com/vectorgrp/sil-kit/releases). You will need this for being able to start a sil-kit-registry.
+You should also download a SIL Kit Release directly from [SIL Kit Releases](https://github.com/vectorgrp/sil-kit/releases). You will need this for being able to start a sil-kit-registry.
 
 ## Install the sil-kit-adapter-vcan (optional)
 If you call the following command (can be done for self-built and pre-built package after cmake configure) ``sil-kit-adapter-vcan`` can be called from everywhere without defining a path:  
@@ -117,7 +117,7 @@ The application *optionally* takes the following command line arguments:
 
 ## SocketCAN Demo
 The aim of this demo is to showcase a simple adapter that forwards CAN traffic from Linux terminal running a virtual CAN interface through to
-Vector SIL Kit. 
+SIL Kit. 
 
 This demo is further explained in [SocketCAN/README.md](SocketCAN/README.md).
 
