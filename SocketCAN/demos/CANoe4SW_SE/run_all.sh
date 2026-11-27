@@ -52,6 +52,7 @@ if [[ exit_status -ne 0 ]]; then
 fi
 
 kill $script_pid
+wait $script_pid 2>/dev/null # let its cleanup (delete can0) finish before reusing can0
 
 # Run and test adapter with vcan device of MTU 16
 $scriptDir/../shell_scripts/setup_vcan_start_adapter_send_CAN_frames.sh -mtu16 &> $logDir/setup_vcan_start_adapter_send_CAN_frames-mtu16_${timestamp}.out &
